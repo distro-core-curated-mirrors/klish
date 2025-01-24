@@ -17,7 +17,7 @@ The main target for the klish is a Linux platform.
 ## Build
 
 The version 3 needs libfaux (https://faux.libcode.org) to be built.
-klish-3.1.0 based on [faux-2.2.0](https://src.libcode.org/download/faux/faux-2.2.0.tar.xz)
+The klish-3.1.0 is based on [faux-2.2.0](https://src.libcode.org/download/faux/faux-2.2.0.tar.xz).
 
 
 ## Resources

@@ -292,38 +292,38 @@ first parameter header, first parameter data, second parameter header
 parameter, data of the second parameter, etc. All fields in the headers are passed with
 using network (big-endian) byte order.
 
-KTP headline:
+KTP header:
 
-|Size, bytes|Field name |Field value|
-|------------|---------------------------------|-------------|
-|4 |Magic number |0x4b545020 |
-|1 | Protocol version (major) |0x01 |
-|1 | Protocol version (minor) |0x00 |
-|2 | | Command code | |
-|4 |4 | | | |
-|4 | Not used |
-|4 |4 | Number of parameters | |
-|4 |The length of the entire packet (with header)| |
+|Size, bytes |Field name                                   |Field value|
+|------------|---------------------------------------------|-----------|
+|4           |Magic number                                 |0x4b545020 |
+|1           |Protocol version (major)                     |0x01       |
+|1           |Protocol version (minor)                     |0x00       |
+|2           |Command code                                 |           |
+|4           |Status                                       |           |
+|4           |Not used                                     |           |
+|4           |Number of parameters                         |           |
+|4           |The length of the entire packet (with header)|           |
 
-Team Codes:
+Command codes:
 
-| Code| Name | Direction| Description |
-|---|--------------|-----------|-----------------------------------------------|
-|'i'|STDIN |-> |stdin user input (PARAM_LINE) |
-|'o'|STDOUT |<- |stdout command output (PARAM_LINE) |
-|'e'|STDERR |<- |stderr command output (PARAM_LINE) |
-|'c'|CMD |-> | Execute command (PARAM_LINE) |
-|'C'|CMD_ACK |<- | The result of the command |
-|'v'|COMPLETION |-> | Request for autocompletion (PARAM_LINE) |
-|'V'|COMPLETION_ACK|<- |Possible additions (PARAM_PREFIX, PARAM_LINE)|
-|'h'|HELP |-> | Prompt (PARAM_LINE) |
-|'H'|HELP_ACK |<- | Hint (PARAM_PREFIX, PARAM_LINE) |
-|'n'|NOTIFICATION |<-> |Asynchronous message (PARAM_LINE) |
-|'a'|AUTH |-> | | Authentication Request |
-|'A'|AUTH_ACK |<- |AUTH_ACK |<- |Authentication Confirmation |
-|'I'|STDIN_CLOSE |-> |stdin was closed |
-|'O'|STDOUT_CLOSE |-> |stdout was closed |
-|'E'|STDERR_CLOSE |-> |stderr was closed |
+|Code|Name          |Direction|Description                                  |
+|----|--------------|---------|---------------------------------------------|
+|'i' |STDIN         |->       |stdin user input (PARAM_LINE)                |
+|'o' |STDOUT        |<-       |stdout command output (PARAM_LINE)           |
+|'e' |STDERR        |<-       |stderr command output (PARAM_LINE)           |
+|'c' |CMD           |->       |Execute command (PARAM_LINE)                 |
+|'C' |CMD_ACK       |<-       |The result of the command                    |
+|'v' |COMPLETION    |->       |Request for autocompletion (PARAM_LINE)      |
+|'V' |COMPLETION_ACK|<-       |Possible additions (PARAM_PREFIX, PARAM_LINE)|
+|'h' |HELP          |->       |Prompt (PARAM_LINE)                          |
+|'H' |HELP_ACK      |<-       |Hint (PARAM_PREFIX, PARAM_LINE)              |
+|'n' |NOTIFICATION  |<->      |Asynchronous message (PARAM_LINE)            |
+|'a' |AUTH          |->       |Authentication Request                       |
+|'A' |AUTH_ACK      |<-       |Authentication Confirmation                  |
+|'I' |STDIN_CLOSE   |->       |stdin was closed                             |
+|'O' |STDOUT_CLOSE  |->       |stdout was closed                            |
+|'E' |STDERR_CLOSE  |->       |stderr was closed                            |
 
 The "Direction" column shows in which direction the command is transmitted. Arrow
 right arrow means transfer from client to server, left arrow means transfer from server
@@ -333,37 +333,37 @@ data is being transmitted.
 The status field in the KTP header is a 32-bit field. Bit values
 status fields:
 
-|Bit Mask|Bit Name |Value |
-|----------|------------------|-----------------------------------------------|
-|0x00000001|STATUS_ERROR | Error |
-|0x00000002|STATUS_INCOMPLETED|Command execution not completed |
-|0x00000100|STATUS_TTY_STDIN |stdin client is terminal |
-|0x00000200|STATUS_TTY_STDOUT |stdout client is terminal |
-|0x00000400|STATUS_TTY_STDERR |stderr client is a terminal |
-|0x00001000|STATUS_NEED_STDIN |Command accepts user input |
-|0x00002000|STATUS_INTERACTIVE|The output of the command is for the terminal |
-|0x00010000|STATUS_DRY_RUN | Idle start. The command does not need to be executed|
-|0x80000000|STATUS_EXIT | Ending session |
+|Bit Mask  |Bit Name          |Value                                        |
+|----------|------------------|---------------------------------------------|
+|0x00000001|STATUS_ERROR      |Error                                        |
+|0x00000002|STATUS_INCOMPLETED|Command execution not completed              |
+|0x00000100|STATUS_TTY_STDIN  |stdin client is terminal                     |
+|0x00000200|STATUS_TTY_STDOUT |stdout client is terminal                    |
+|0x00000400|STATUS_TTY_STDERR |stderr client is a terminal                  |
+|0x00001000|STATUS_NEED_STDIN |Command accepts user input                   |
+|0x00002000|STATUS_INTERACTIVE|The output of the command is for the terminal|
+|0x00010000|STATUS_DRY_RUN    |Idle start. Don't execute the command        |
+|0x80000000|STATUS_EXIT       |Ending session                               |
 
-Parameter Title:
+Parameter header:
 
-|Size, bytes|Field name |
-|------------|--------------------------------------|
-|2 |2 | Parameter type |
-|2 | Not used |
-|1 |Parameter data length (without header)|
+|Size, bytes|Field name                            |
+|-----------|--------------------------------------|
+|2          |Parameter type                        |
+|2          |Not used                              |
+|1          |Parameter data length (without header)|
 
-Parameter Types:
+Parameter types:
 
-| Code| Name | Direction| Description |
-|---|-------------|-----------|---------------------------------------------|
-|'L'|PARAM_LINE |<-> | String. Multifunctional |
-|'P'|PARAM_PREFIX |<- |String. For autocomplete and hint |
-|'$'|PARAM_PROMPT |<- |String. User prompt |
-|'H'|PARAM_HOTKEY |<- | Function key and its meaning |
-|'W'|PARAM_WINCH |-> | The size of the user window. When changing|
-|'E'|PARAM_ERROR |<- |String. Error message |
-|'R'|PARAM_RETCODE|<- | Return code of the executed command |
+|Code|Name         |Direction|Description                               |
+|----|-------------|---------|------------------------------------------|
+|'L' |PARAM_LINE   |<->      |String. Multifunctional                   |
+|'P' |PARAM_PREFIX |<-       |String. For autocomplete and hint         |
+|'$' |PARAM_PROMPT |<-       |String. User prompt                       |
+|'H' |PARAM_HOTKEY |<-       |Function key and its meaning              |
+|'W' |PARAM_WINCH  |->       |The size of the user window. When changing|
+|'E' |PARAM_ERROR  |<-       |String. Error message                     |
+|'R' |PARAM_RETCODE|<-       |Return code of the executed command       |
 
 From the server to the client, along with the command and the parameters corresponding to the command,
 can be passed additional parameters. For example, with the CMD_ACK command,
@@ -584,29 +584,29 @@ also starts with the `/` character, indicating the root element.
 > Relative paths are not supported at this time
 
 ```
-<KLISH>.
+<KLISH>
 
 <PTYPE name="PTYPE1">
-<ACTION sym="sym1"\>
-</PTYPE>.
+    <ACTION sym="sym1"\>
+</PTYPE>
 
 <VIEW name="view1">
 
-<VIEW name="view1_2">
-<COMMAND name="cmd1">
-<PARAM name="par1" ptype="/PTYPE1"/>
-</COMMAND>.
-</VIEW>.
+    <VIEW name="view1_2">
+        <COMMAND name="cmd1">
+            <PARAM name="par1" ptype="/PTYPE1"/>
+        </COMMAND>
+    </VIEW>
 
-</VIEW>.
+</VIEW>
 
 <VIEW name="view2">
 
-<VIEW ref="/view1/view1_2"/>
+    <VIEW ref="/view1/view1_2"/>
 
-</VIEW>.
+</VIEW>
 
-</KLISH>.
+</KLISH>
 ```
 
 The "par1" parameter references `PTYPE` using the path `/PTYPE1`. Type names
@@ -657,15 +657,15 @@ Any klish configuration XML file must begin with an opening `KLISH` tag
 and end with a closing tag `KLISH`.
 
 ```
-<?xml version="1.0" encoding="UTF-8"?
+<?xml version="1.0" encoding="UTF-8"?>
 <KLISH
-xmlns="https://klish.libcode.org/klish3"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="https://src.libcode.org/pkun/klish/src/master/klish.xsd">
+    xmlns="https://klish.libcode.org/klish3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://src.libcode.org/pkun/klish/src/master/klish.xsd">
 
 <!-- There's any configuration for klish -->
 
-</KLISH>.
+</KLISH>
 ```
 
 The header introduces its default XML namespace
@@ -756,11 +756,11 @@ settings for the plug-in can be specified as data.
 
 ```
 <PLUGIN name="sysrepo">
-JuniperLikeShow = y
-FirstKeyWithStatement = n
-MultiKeysWithStatement = y
-Colorize = y
-</PLUGIN>.
+    JuniperLikeShow = y
+    FirstKeyWithStatement = n
+    MultiKeysWithStatement = y
+    Colorize = y
+</PLUGIN>
 ```
 
 
@@ -796,8 +796,8 @@ any other command manually entered by the operator.
 
 ```
 <COMMAND name="exit" help="Exit view or shell">
-<ACTION sym="nav">pop</ACTION>
-</COMMAND>.
+    <ACTION sym="nav">pop</ACTION>
+</COMMAND>
 
 <HOTKEY key="^Z" cmd="exit"\>
 ```
@@ -839,17 +839,17 @@ Only one block of actions is always performed.
 
 ```
 <COMMAND name="cmd1">
-<ACTION sym="sym1"\>
-<SWITCH min="0">
-<COMMAND name="opt1">
-<ACTION sym="sym2"\>
-</COMMAND>.
-<COMMAND name="opt2"\>
-<PARAM name="opt3" ptype="/STRING">
-<ACTION sym="sym3"\>
-</PARAM>
-</SWITCH>.
-</COMMAND>.
+    <ACTION sym="sym1"\>
+    <SWITCH min="0">
+        <COMMAND name="opt1">
+            <ACTION sym="sym2"\>
+        </COMMAND>
+       <COMMAND name="opt2"\>
+       <PARAM name="opt3" ptype="/STRING">
+           <ACTION sym="sym3"\>
+       </PARAM>
+    </SWITCH>
+</COMMAND>
 ```
 
 The example declares the command "cmd1", which has three alternatives (specified can be
@@ -1133,17 +1133,17 @@ he must fulfill.
 
 ```
 <COMMAND name="ls" help="List root dir">
-<ACTION sym="script">
-ls /
-</ACTION>.
-</COMMAND>.
+    <ACTION sym="script">
+    ls /
+    </ACTION>
+</COMMAND>
 
 <COMMAND name="pytest" help="Test for Python script">
-<ACTION sym="script">#!/usr/bin/python
-import os
-print('ENV', os.getenv('KLISH_COMMAND')))
-</ACTION>.
-</COMMAND>.
+    <ACTION sym="script">#!/usr/bin/python
+    import os
+    print('ENV', os.getenv('KLISH_COMMAND')))
+    </ACTION>
+</COMMAND>
 ```
 
 Note that the shebang `#!/usr/bin/python` is specified in the "pytest" command,
@@ -1239,12 +1239,12 @@ The `HELP` element generates the hint text dynamically.
 <COMMAND name="simple" help="Command with static help"/>
 
 <COMMAND name="dyn">
-<HELP>.
-<ACTION sym="script">
-ls -la "/etc/passwd"
-</ACTION>.
-<HELP>.
-</COMMAND>.
+    <HELP>
+        <ACTION sym="script">
+        ls -la "/etc/passwd"
+        </ACTION>
+     <HELP>
+</COMMAND>
 ```
 
 If both the `help` attribute and the nested element are specified for an element at the same time
@@ -1311,9 +1311,9 @@ The following are examples of branching within a command:
 ```
 <!-- Example 1 -->
 <COMMAND name="cmd1">
-<PARAM name="param1" ptype="/INT"/>
-<PARAM name="param2" ptype="/STRING"/>
-</COMMAND>.
+    <PARAM name="param1" ptype="/INT"/>
+    <PARAM name="param2" ptype="/STRING"/>
+</COMMAND>
 ```
 
 The command defaults to `mod="sequence"`, so the operator would have to enter
@@ -1322,9 +1322,9 @@ both parameters, one after the other.
 ```
 <!-- Example 2 -->
 <COMMAND name="cmd2" mode="switch">
-<PARAM name="param1" ptype="/INT"/>
-<PARAM name="param2" ptype="/STRING"/>
-</COMMAND>.
+    <PARAM name="param1" ptype="/INT"/>
+    <PARAM name="param2" ptype="/STRING"/>
+</COMMAND>
 ```
 
 The value of the `mode` attribute is overridden, so the operator would have to enter
@@ -1339,11 +1339,11 @@ parameters are important.
 ```
 <!-- Example 3 -->
 <COMMAND name="cmd3">
-<SWITCH>.
-<PARAM name="param1" ptype="/INT"/>
-<PARAM name="param2" ptype="/STRING"/>
-</SWITCH>.
-</COMMAND>.
+    <SWITCH>
+        <PARAM name="param1" ptype="/INT"/>
+        <PARAM name="param2" ptype="/STRING"/>
+    </SWITCH>
+</COMMAND>
 ```
 
 This example is identical to example "2". Only instead of the `mode` attribute the following is used
@@ -1352,15 +1352,15 @@ nested tag `SWITCH`. The entry in example "2" is shorter, in example "3" it is c
 ```
 <!-- Example 4 -->
 <COMMAND name="cmd4">
-<SWITCH>.
-<PARAM name="param1" ptype="/INT">
-<PARAM name="param3" ptype="/STRING">
-<PARAM name="param4" ptype="/STRING">
-</PARAM>
-<PARAM name="param2" ptype="/STRING"/>
-</SWITCH>.
-<PARAM name="param5" ptype="/STRING"/>
-</COMMAND>.
+    <SWITCH>
+        <PARAM name="param1" ptype="/INT">
+            <PARAM name="param3" ptype="/STRING">
+            <PARAM name="param4" ptype="/STRING">
+        </PARAM>
+        <PARAM name="param2" ptype="/STRING"/>
+    </SWITCH>
+    <PARAM name="param5" ptype="/STRING"/>
+</COMMAND>
 ```
 
 This demonstrates how command line arguments are parsed. When selected
@@ -1374,16 +1374,16 @@ the process is complete.
 ```
 <!-- Example 5 -->
 <COMMAND name="cmd5">
-<SWITCH>.
-<SEQ>.
-<PARAM name="param1" ptype="/INT">
-<PARAM name="param3" ptype="/STRING">
-<PARAM name="param4" ptype="/STRING">
-</SEQ>.
-<PARAM name="param2" ptype="/STRING"/>
-</SWITCH>.
-<PARAM name="param5" ptype="/STRING"/>
-</COMMAND>.
+    <SWITCH>
+        <SEQ>
+            <PARAM name="param1" ptype="/INT">
+            <PARAM name="param3" ptype="/STRING">
+            <PARAM name="param4" ptype="/STRING">
+        </SEQ>
+        <PARAM name="param2" ptype="/STRING"/>
+    </SWITCH>
+    <PARAM name="param5" ptype="/STRING"/>
+</COMMAND>
 ```
 
 The example is completely similar to the behavior of example "4". Only instead of nesting
@@ -1394,12 +1394,12 @@ one after another.
 ```
 <!-- Example 6 -->
 <COMMAND name="cmd6">
-<COMMAND name="cmd6_1">
-<PARAM name="param3" ptype="/STRING">
-</COMMAND>.
-<PARAM name="param1" ptype="/INT"/>
-<PARAM name="param2" ptype="/STRING"/>
-</COMMAND>.
+    <COMMAND name="cmd6_1">
+        <PARAM name="param3" ptype="/STRING">
+    </COMMAND>
+    <PARAM name="param1" ptype="/INT"/>
+    <PARAM name="param2" ptype="/STRING"/>
+</COMMAND>
 ```
 
 The example shows a nested "subcommand" named "cmd1_6". Here the subcommand
@@ -1448,37 +1448,37 @@ If the element is a reference, the `ref` attribute is defined in the element. Th
 - reference to the target schema element.
 
 ```
-<KLISH>.
+<KLISH>
 
 <PTYPE name="ptype1">
-<ACTION sym="INT"/>
-</PTYPE>.
+    <ACTION sym="INT"/>
+</PTYPE>
 
 <VIEW name="view1">
-<COMMAND name="cmd1"/>
-</VIEW>.
+    <COMMAND name="cmd1"/>
+</VIEW>
 
 <VIEW name="view2">
-<VIEW ref="/view1"/>.
-<COMMAND name="cmd2">
-<PARAM name="param1" ptype="/ptype1"/>
-<PARAM name="param2">
-<PTYPE ref="/ptype1"/>
-</PARAM>
-</COMMAND>.
-</VIEW>.
+    <VIEW ref="/view1"/>
+    <COMMAND name="cmd2">
+        <PARAM name="param1" ptype="/ptype1"/>
+        <PARAM name="param2">
+            <PTYPE ref="/ptype1"/>
+        </PARAM>
+    </COMMAND>
+</VIEW>
 
 <VIEW name="view3">
-<COMMAND ref="/view2/cmd2"/>
-</VIEW>.
+    <COMMAND ref="/view2/cmd2"/>
+</VIEW>
 
 <VIEW name="view4">
-<COMMAND name="do">
-<VIEW ref="/view1"/>.
-</COMMAND>.
-</VIEW>.
+    <COMMAND name="do">
+        <VIEW ref="/view1"/>
+    </COMMAND>
+</VIEW>
 
-</KLISH>.
+</KLISH>
 ```
 
 In the example, "view2" contains a reference to "view1", which is equivalent to declaring a copy of the
@@ -1631,25 +1631,25 @@ to add their contents to the place in the schema where the link is created.
 
 ```
 <VIEW name="view1">
-<COMMAND name="cmd1"/>
-<VIEW name="view1_2">
-<COMMAND name="cmd2"/>
-</VIEW>.
-</VIEW>.
+    <COMMAND name="cmd1"/>
+    <VIEW name="view1_2">
+        <COMMAND name="cmd2"/>
+   </VIEW>
+</VIEW>
 
 <VIEW name="view2">
-<COMMAND name="cmd3"/>
-<VIEW ref="/view1"/>.
-</VIEW>.
+    <COMMAND name="cmd3"/>
+    <VIEW ref="/view1"/>
+</VIEW>
 
 <VIEW name="view3">
-<COMMAND name="cmd4"/>
-<VIEW ref="/view1/view1_2"/>
-</VIEW>.
+    <COMMAND name="cmd4"/>
+    <VIEW ref="/view1/view1_2"/>
+</VIEW>
 
 <VIEW name="view4">
-<COMMAND name="cmd5"/>
-</VIEW>.
+    <COMMAND name="cmd5"/>
+</VIEW>
 ```
 
 The example demonstrates how scopes work in relation to available scopes
@@ -1716,31 +1716,31 @@ level in the current session path.
 
 ```
 <PTYPE name="ptype1">
-<ACTION sym="INT"/>
-</PTYPE>.
+    <ACTION sym="INT"/>
+</PTYPE>
 
 <VIEW name="view1">
 
-<COMMAND name="cmd1" help="First command">
-<PARAM name="param1" ptype="/ptype1"/>
-<ACTION sym="sym1"/>
-</COMMAND>.
+    <COMMAND name="cmd1" help="First command">
+        <PARAM name="param1" ptype="/ptype1"/>
+        <ACTION sym="sym1"/>
+    </COMMAND>
 
-<COMMAND name="cmd2">
-<HELP>.
-<ACTION sym="script">
-echo "Second command"
-</ACTION>.
-</HELP>.
-<COMMAND name="cmd2_1" value="sub2" min="0" help="Subcommand">
-<PARAM name="param1" ptype="ptype1" help="Par 1"/>
-</COMMAND>.
-<COMMAND ref="/view1/cmd1"/>
-<PARAM name="param2" ptype="ptype1" help="Par 2"/>
-<ACTION sym="sym2"/>
-</COMMAND>.
+    <COMMAND name="cmd2">
+        <HELP>
+            <ACTION sym="script">
+            echo "Second command"
+            </ACTION>
+        </HELP>
+        <COMMAND name="cmd2_1" value="sub2" min="0" help="Subcommand">
+            <PARAM name="param1" ptype="ptype1" help="Par 1"/>
+        </COMMAND>
+        <COMMAND ref="/view1/cmd1"/>
+        <PARAM name="param2" ptype="ptype1" help="Par 2"/>
+        <ACTION sym="sym2"/>
+     </COMMAND>
 
-</VIEW>.
+</VIEW>
 ```
 
 The command "cmd1" is the simplest version of the command with a hint, one mandatory
@@ -1803,33 +1803,33 @@ strings matched to the parameter.
 
 ```
 <PTYPE name="ptype1">
-<ACTION sym="INT"/>
-</PTYPE>.
+    <ACTION sym="INT"/>
+</PTYPE>
 
 <VIEW name="view1">
 
-<COMMAND name="cmd1" help="First command">
+    <COMMAND name="cmd1" help="First command">
 
-<PARAM name="param1" ptype="/ptype1" help="Param 1"/>
+        <PARAM name="param1" ptype="/ptype1" help="Param 1"/>
 
-<PARAM name="param2" help="Param 2">
-<PTYPE ref="/ptype1"/>
-</PARAM>
+        <PARAM name="param2" help="Param 2">
+            <PTYPE ref="/ptype1"/>
+        </PARAM>
 
-<PARAM name="param3" help="Param 3">
-<PTYPE>.
-<ACTION sym="INT"/>
-</PTYPE>.
-</PARAM>
+        <PARAM name="param3" help="Param 3">
+            <PTYPE>
+                <ACTION sym="INT"/>
+            </PTYPE>
+        </PARAM>
 
-<PARAM name="param4" ptype="/ptype1" help="Param 4">
-<PARAM name="param5" ptype="/ptype1" help="Param 5"/>
-</PARAM>
+        <PARAM name="param4" ptype="/ptype1" help="Param 4">
+            <PARAM name="param5" ptype="/ptype1" help="Param 5"/>
+        </PARAM>
 
-<ACTION sym="sym1"/>
-</COMMAND>.
+        <ACTION sym="sym1"/>
+    </COMMAND>
 
-</VIEW>.
+</VIEW>
 ```
 
 Parameters "param1", "param2", "param3" are identical. In the first case the type is set
@@ -1870,12 +1870,12 @@ Normally, the `SWITCH` element is used without attributes.
 
 ```
 <COMMAND name="cmd1" help="First command">
-<SWITCH>.
-<COMMAND name="sub1"/>
-<COMMAND name="sub2"/>
-<COMMAND name="sub3"/>
-</SWITCH>.
-</COMMAND>.
+    <SWITCH>
+        <COMMAND name="sub1"/>
+        <COMMAND name="sub2"/>
+        <COMMAND name="sub3"/>
+     </SWITCH>
+</COMMAND>
 ```
 
 By default, the `COMMAND` element has the `mode="sequence"` attribute. If the
@@ -1911,18 +1911,18 @@ Normally, the `SEQ` element is used without attributes.
 
 ```
 <VIEW name="view1">
-<SEQ>.
-<PARAM name="param1" ptype="/ptype1"/>
-<PARAM name="param2" ptype="/ptype1"/>
-<PARAM name="param3" ptype="/ptype1"/>
-</SEQ>.
-</VIEW>.
+    <SEQ>
+        <PARAM name="param1" ptype="/ptype1"/>
+        <PARAM name="param2" ptype="/ptype1"/>
+        <PARAM name="param3" ptype="/ptype1"/>
+    </SEQ>
+</VIEW>
 
 <VIEW name="view2">
-<COMMAND name="cmd1" help="First command">
-<VIEW ref="/view1">
-</COMMAND>.
-</VIEW>.
+    <COMMAND name="cmd1" help="First command">
+        <VIEW ref="/view1">
+    </COMMAND>
+</VIEW>
 ```
 
 Suppose we have created an auxiliary `VIEW` containing a list of frequently
@@ -1963,8 +1963,8 @@ of the declared data type.
 
 ```
 <PTYPE name="ptype1" help="Integer">
-<ACTION sym="INT"/>
-</PTYPE>.
+    <ACTION sym="INT"/>
+</PTYPE>
 
 <PARAM name="param1" ptype="/ptype1" help="Param 1"/>
 ```
@@ -2009,11 +2009,11 @@ Normally, `PROMPT` is used without attributes.
 ```
 <VIEW name="main">
 
-<PROMPT>.
-<ACTION sym="prompt">%u@%h&gt; </ACTION>
-</PROMPT>.
+    <PROMPT>
+        <ACTION sym="prompt">%u@%h&gt; </ACTION>
+    </PROMPT>
 
-</VIEW>.
+</VIEW>
 ```
 
 In the example for `VIEW` named "main", which is the current path on the
@@ -2049,9 +2049,9 @@ Normally, `HELP` is used without attributes.
 
 ```
 <PARAM name="param1" ptype="/ptype1">
-<HELP>.
-<ACTION sym="sym1"/>
-</HELP>.
+    <HELP>
+        <ACTION sym="sym1"/>
+    </HELP>
 </PARAM>
 ```
 
@@ -2081,11 +2081,11 @@ The klish client shows autocomplete options when the `Tab` key is pressed.
 
 ```
 <PARAM name="proto" ptype="/STRING" help="Protocol">
-<COMPL>.
-<ACTION sym="printl">tcp</ACTION>
-<ACTION sym="printl">udp</ACTION>
-<ACTION sym="printl">icmp</ACTION>
-</COMPL>.
+    <COMPL>
+        <ACTION sym="printl">tcp</ACTION>
+        <ACTION sym="printl">udp</ACTION>
+        <ACTION sym="printl">icmp</ACTION>
+    </COMPL>
 </PARAM>
 ```
 
@@ -2118,12 +2118,12 @@ The `COND` element is forcibly assigned the value of the attribute
 
 ```
 <COMMAND name="cmd1" help="Command 1">
-<COND>
-<ACTION sym="script">
-test -e /tmp/cond_file
-</ACTION>.
-</COND>.
-</COMMAND>.
+    <COND>
+        <ACTION sym="script">
+        test -e /tmp/cond_file
+        </ACTION>
+    </COND>
+</COMMAND>
 ```
 
 If the `/tmp/cond_file` file exists, the "cmd1" command is available to the operator,
@@ -2254,7 +2254,7 @@ only the very last component of the path.
 <ACTION sym="nav">
 pop
 push /view_name1
-</ACTION>.
+</ACTION>
 ```
 
 The example shows how you can repeat the `replace` subcommand using other
@@ -2341,19 +2341,19 @@ Examples:
 
 ```
 <COMMAND name="ls" help="List path">
-<PARAM name="path" ptype="/STRING" help="Path"/>
-<ACTION sym="script">
-echo "$KLISH_COMMAND"
-ls "$KLISH_PARAM_path"
-</ACTION>.
-</COMMAND>.
+    <PARAM name="path" ptype="/STRING" help="Path"/>
+    <ACTION sym="script">
+    echo "$KLISH_COMMAND"
+    ls "$KLISH_PARAM_path"
+    </ACTION>
+</COMMAND>
 
 <COMMAND name="pytest" help="Test for Python script">
-<ACTION sym="script">#!/usr/bin/python
-import os
-print('ENV', os.getenv('KLISH_COMMAND')))
-</ACTION>.
-</COMMAND>.
+    <ACTION sym="script">#!/usr/bin/python
+    import os
+    print('ENV', os.getenv('KLISH_COMMAND')))
+    </ACTION>
+</COMMAND>
 ```
 
 The "ls" command uses the shell interpreter and displays a list of files by
@@ -2431,9 +2431,9 @@ functions.
 ```
 local pars = klish.pars()
 for k, v in ipairs(pars) do
-for i, p in ipairs(pars[v]) do
-print(string.format("%s[%d] = %s", v, i, p))
-end
+  for i, p in ipairs(pars[v]) do
+    print(string.format("%s[%d] = %s", v, i, p))
+  end
 end
 ```
 

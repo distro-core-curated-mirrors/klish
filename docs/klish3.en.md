@@ -1444,8 +1444,7 @@ is declared in the place of the scheme where element "#1" is located. It would b
 that this is equivalent to creating a copy of element "#2" at the location where the defined
 element "#1".
 
-If the element is a reference, the `ref` attribute is defined in the element. The value of the attribute
-- reference to the target schema element.
+If the element is a reference, the `ref` attribute is defined in the element. The value of the attribute is reference to the target schema element.
 
 ```
 <KLISH>

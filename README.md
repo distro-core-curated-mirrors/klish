@@ -24,7 +24,10 @@ klish-3.1.0 based on [faux-2.2.0](https://src.libcode.org/download/faux/faux-2.2
 
 Homepage : http://klish.libcode.org
 
-Docs : https://src.libcode.org/pkun/klish/src/master/docs/klish3.ru.md (in Russian)
+Docs :
+
+* https://src.libcode.org/pkun/klish/src/master/docs/klish3.en.md (English)
+* https://src.libcode.org/pkun/klish/src/master/docs/klish3.ru.md (Russian)
 
 Repository : https://src.libcode.org/pkun/klish
 
@@ -37,3 +40,7 @@ Download : https://src.libcode.org/download/klish/
 Latest release : https://src.libcode.org/download/klish/klish-3.1.0.tar.xz
 
 Author : Serj Kalichev `pkun(_at_)libcode.org`
+
+Plugins :
+
+* https://src.libcode.org/pkun/klish-plugin-sysrepo

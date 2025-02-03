@@ -4,45 +4,45 @@
 ## Overview
 
 The klish program is designed to organize the command line interface,
-in which only a strictly defined set of commands is available to the operator. This
-distinguishes klish from standard shell interpreters, where an operator can
+in which only a strictly defined set of commands is available to the operator.
+This distinguishes klish from standard shell interpreters, where an operator can
 use any commands existing in the system and the ability to execute them
-depends only on access rights. The set of commands available in klish is defined on
-configuration step and can be set, in general, in a variety of ways,
-The main ones are XML configuration files. Commands in klish are not
-are system commands, and are fully defined in the configuration files,
-with all possible parameters, syntax, and actions that they
-fulfillment.
+depends only on access rights. The set of commands available in klish is defined
+on configuration step and can be set, in general, in a variety of ways.
+The main way are XML configuration files. Commands in klish are not
+system commands, and are fully defined in the configuration files,
+with all possible parameters, syntax, and their actions.
 
-The main application of klish is in embedded systems where the operator has access to
-only certain, device-specific commands, not
+The main application of klish is embedded systems where the operator has access
+to only certain, device-specific commands, not
 arbitrary set of commands, as in general-purpose systems. In such embedded
-klish systems can replace the shell interpreter, which is not available to the
-of the operator.
+systems klish can replace the standard shell interpreter, which is not available
+to the operator.
 
 An example of embedded systems is managed networking equipment.
-Historically, there have been two main approaches to organization in this segment
-command line interface. Conventionally, they can be called the "Cisco" approach and the "Cisco" approach
-"Juniper. Both Cisco and Juniper have two modes of operation - command mode and
-configuration mode. In command mode, the entered commands are immediately
-are executed but do not affect the system configuration. These are view commands
-status, commands to control the device, but not to change its configuration.
-In configuration mode
-the hardware and services are being configured. In Cisco, the configuration commands also
-are executed immediately, changing the system configuration. In Juniper, the configuration
-can be conventionally represented as a text file, changes in which are
-are performed using standard editing commands. When editing
-the changes are not applied to the system. And only by special command the entire
-The accumulated set of changes is applied at once, thus ensuring that
-change consistency. With the Cisco approach, similar behavior can also be
-emulate by designing commands in a certain way, but for Cisco, it's less of a
-the natural way.
+Historically, there have been two main approaches to command line interface
+organization. Conventionally, they can be called the "Cisco" approach and the
+"Juniper" approach. Both Cisco and Juniper have two modes of operation - command
+mode and configuration mode. In command mode, the entered commands are
+immediately executed but do not affect the system configuration. These are
+status view commands, commands to control the device, but not to change its
+configuration. In configuration mode the hardware and services are being
+configured. In Cisco, the configuration commands also are executed immediately,
+changing the system configuration. In Juniper, the configuration
+can be conventionally represented as a "text file", changes in which are
+performed using standard editing commands. When editing
+the changes are not applied to the system. And only by special command the
+entire accumulated set of changes is applied at once, thus ensuring that
+changes are consistent. With the Cisco approach, similar behavior can also be
+emulate by designing commands in a certain way, but for Cisco, it's not a
+natural way.
 
-Which approach is better and easier in a particular case is determined by the task.
-Klish is primarily designed for the Cisco approach, i.e., immediately executable
-teams. However, the project has a plugin system, which allows you to extend it
-capabilities. So the plugin klish-plugin-sysrepo, implemented by a separate project,
-Powered by sysrepo storage, it allows you to organize the Juniper approach.
+Which approach is better and easier in a particular case is determined by the
+task. Klish is primarily designed for the Cisco approach, i.e. immediately
+executable commands. However, the project has a plugin system, which allows you
+to extend its capabilities. So the plugin klish-plugin-sysrepo, implemented as
+a separate project, is powered by sysrepo storage, it allows you to organize
+the Juniper approach.
 
 
 ## Basic Information
@@ -50,67 +50,67 @@ Powered by sysrepo storage, it allows you to organize the Juniper approach.
 ![Klish client-server model](/klish-client-server.ru.png "Klish client-server model")
 
 The klish project uses a client-server model. Listening server klishd
-loads the command configuration and waits for requests from clients on the UNIX socket (1).
-On a connection from a client, the klishd listening server spawns (fork()) a separate
-process (2), which will be concerned with serving one particular customer.
-The spawned process is called the klishd serving server. Listening server
-klishd continues to expect new connections from clients. Interaction between
-clients and the serving server are carried out over UNIX sockets using the
-KTP (Klish Transfer Protocol), which is specially designed for this purpose
-(3).
+loads the command configuration and waits for requests from clients on the
+UNIX socket (1). On a connection from a client, the klishd listening server
+spawns (fork()) a separate process (2), which will be concerned with serving one
+particular client. The spawned process is called the klishd serving server.
+Listening server klishd continues to wait for a new connections from clients.
+Interaction between clients and the serving server are carried out over UNIX
+sockets using the KTP (Klish Transfer Protocol), which is specially designed for
+this purpose (3).
 
-The client's task is to transmit input from the operator to the server and receive it from the server
-the result to be shown to the operator. The client does not know what commands exist,
-how to execute them. The execution is handled by the server side. Since the client has
-relatively simple code, it is not difficult to implement alternative programs -
-clients, such as a graphical client or a client for automated
-controls. Right now, there is only a text-based command line client called klish.
+The client's task is to transmit input from the operator to the server and
+receive the response from the server to show it to the operator. The client does
+not know the list of commands and how to execute them. The execution is handled
+by the server side. So the client has relatively simple code, it is not difficult
+to implement alternative client programs, such as a graphical client or a client
+for automated controls. Right now, there is only a text-based command line client
+called klish.
 
 ![Klish Libraries](/klish-libs.ru.png "Klish Libraries")
 
-The basis of the klish project is the libklish library. The klish client is based on it
-and klishd server. The library implements all basic mechanisms of work and
-interactions. The library is part of the klish project.
+The basis of the klish project is the libklish library. The klish client and
+klishd server are based on it. The library implements all basic mechanisms.
+The library is a part of the klish project.
 
-The text client uses another built-in library, the
-libtinyrl (Tiny ReadLine). The library provides interaction with the user
-when working on the command line.
+The text client uses additional built-in library called libtinyrl (Tiny
+ReadLine). The library provides interaction with the user while working with the
+command line.
 
 All executable files of the klish project, as well as all its built-in libraries
-use the libfaux (Library of Auxiliary Functions) library in their work -
-library of auxiliary functions. In previous versions of the project klish library
-was part of the klish source code, now it has been separated into a separate project and
-includes functions that make it easy to work with strings, files, networking, standard
-data structures, etc. The libfaux library is a mandatory external library
-a dependency for the klish project.
+use the libfaux (Library of Auxiliary Functions). In previous versions of the
+project klish library was part of the klish source code tree, now it has been
+separated into a project and includes functions that make it easy to work with
+strings, files, networking, standard data structures, etc. The libfaux library is
+a mandatory dependency for the klish project.
 
 In addition, klish plugins, discussed below, can also use the
 other libraries for their work.
 
-Klish has two types of plugins. Plugins for loading command configurations
-(let's call them database plugins) and plugins that implement actions to
-commands from the user (let's call them function plugins). Klish does not
-has built-in commands and means of loading configuration (except for a special
+Klish has two types of plugins. Plugins for loading configurations
+(let's call them database plugins) and plugins that implement actions for
+the commands (let's call them function plugins). Klish does not
+have built-in commands and means of loading configuration (except for a special
 ischeme cases). All this functionality is implemented in plugins. Several
-plug-ins with basic functionality are included in the source codes of klish and
+plugins with basic functionality are included in the source codes of klish and
 are located in the "dbs/" and "plugins/" directories.
 
-All necessary plugins are loaded by the klishd listening server at the beginning of its operation.
-What kind of plugins to load custom command configurations are needed
-use it learns from its base configuration file (a special file in the
-INI format). The klishd server then uses the database plugin to load the
-configuration of user commands (e.g. from XML files). From this
-configuration, it learns the list of required function plug-ins, and so loads the
-these plug-ins into memory. However, using functions from function plug-ins will
-only serving (not listening to) the klishd server on requests from the user.
+All necessary plugins are loaded by the klishd listening server at the beginning
+of its operation. What kind of plugins to load to get configurations are
+specified in base configuration file (a special file in the INI format). The
+klishd server then uses the database plugin to load the configuration of user
+commands (e.g. from XML files). From this configuration, it learns the list of
+required function plugins, and so loads these plugins into memory. However, only
+serving (not listening) klishd process will use functions from the function
+plugins.
 
-The configuration file is used to configure the klishd server parameters
-`/etc/klish/klishd.conf`. An alternate configuration file can be specified at
-to start the klishd server.
+The configuration file is used to configure the klishd server parameters is
+`/etc/klish/klishd.conf`. An alternate configuration file can be specified on
+klishd server starting.
 
-The configuration file is used to configure the client parameters
-`/etc/klish/klish.conf`. An alternate configuration file can be specified at
-launching the klish client.
+The configuration file is used to configure the client parameters is
+`/etc/klish/klish.conf`. An alternate configuration file can be specified by the
+klish client command line option.
 
 
 ## Loading command configuration

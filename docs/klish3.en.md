@@ -113,30 +113,29 @@ The configuration file is used to configure the client parameters is
 klish client command line option.
 
 
-## Loading command configuration
+## Loading configuration of commands
 
 ![Command Configuration Download](/klish-plugin-db.ru.png "Command Configuration Download")
 
-The internal representation of the command configuration in klish is kscheme. Kscheme is.
-is a set of C-structures representing the entire tree of commands available to the user,
-visibility areas, parameters, etc. It is by these structures that the
-all internal work - command search, autocompletion, generation of hints at
-user interaction.
+The internal representation of the command configuration in klish is kscheme.
+The kscheme is a set of C-structures representing the entire tree of commands
+available to the user, visibility areas (views), parameters, etc. These
+structures are used for all internal work - command search, autocompletion,
+generation of hints.
 
-In klish there is an intermediate representation of the command configuration in the form of
-C-structures, called ischeme. This representation is similar to kscheme in general, but
-differs from it in that all configuration fields are represented in text form,
-all references to other objects are also text object names, on the
-that are referenced, rather than pointers as in kscheme. There are other differences as well.
+There is an intermediate representation of the command configuration in the
+form of C-structures, called ischeme. This representation is similar to kscheme
+in general, but differs from it in that all configuration fields are represented
+in the text form, all references to other objects are also text object names,
+rather than pointers as in kscheme. There are other differences as well.
 Thus ischeme can be called an "uncompiled schema" and kscheme can be called an
-"compiled". "Compilation", i.e. conversion of ischeme to kscheme
-is produced by the internal mechanisms of klish. Ischeme can be manually set
-by the user in the form of C-structures and assembled as a separate database plugin.
-In this case no other database plugins will be needed, the entire configuration is already
-ready to be converted to kscheme.
+"compiled". "Compilation", i.e. conversion of ischeme to kscheme is produced by
+the internal mechanisms of klish. Ischeme can be manually set by the user in the
+form of C-structures and assembled as a separate database plugin. In this case no
+other database plugins will be needed, the entire configuration is already ready
+to be converted to kscheme.
 
-As part of klish (see dbs/), the following database plugins exist for downloading
-command configurations, i.e., schematics:
+The klish supports the following sources of the command configuration (see dbs/):
 
 * expat - Uses the expat library to load configuration from XML.
 * libxml2 - Uses the libxml2 library to load configuration from XML.
@@ -144,213 +143,203 @@ command configurations, i.e., schematics:
 * ischeme - Uses the configuration built into C code (Internal Scheme).
 
 All database plugins translate an external configuration obtained e.g. from a
-XML files, to ischeme. In the case of ischeme, the additional conversion step is not
-is required, since the ischeme is already in place.
+XML files, to ischeme. In the case of ischeme, the additional conversion step is
+not required.
 
-The installed dbs plugins are located in `/usr/lib` (if configuring the
-assembly with --prefix=/usr). Their names are `libklish-db-<name>.so`, e.g.
+The installed dbs plugins are located in `/usr/lib` (if configuring with
+--prefix=/usr). Their names are `libklish-db-<name>.so`, e.g.
 `/usr/lib/libklish-db-libxml2.so`.
 
 
-## Executable function plug-ins
+## Executable function plugins
 
 Each klish command performs an action or several actions at once.
-These actions need to be described somehow. If we look inside the implementation, klish
-can only run executable compiled code from the plugin. Plugins
-contain so-called symbols (symbol, sym), which, in fact, represent
-are functions with a single fixed API. These symbols can be referenced by
-klish commands. In turn, a symbol can execute complex code, e.g.
-run the shell interpreter with the script defined in the command description
-klish in the configuration file. Alternatively, another character can execute a Lua script.
+These actions need to be described somehow. If we look inside the implementation,
+klish can only run compiled code from the plugin. Plugins contain so-called
+symbols (symbol, sym), which, in fact, represent functions with a known API.
+These symbols can be referenced by klish commands. In turn, a symbol can execute
+complex code, e.g. run the shell interpreter with the script defined in the
+command description in the configuration file. Alternatively, another symbol can
+execute a Lua script.
 
-Klish only knows how to get symbols from plugins. Standard symbols are implemented
-in the plugins included in the klish project. The klish project includes the following
-plug-ins:
+Klish only knows how to get symbols from plugins. Standard symbols are
+implemented in the plugins included in the klish project. The klish project
+includes the following plugins:
 
 * klish - Basic plugin. Navigation, data types (for parameters),
 auxiliary functions.
-* lua - Execution of Lua scripts. The mechanism is built into the plugin and does not use
-an external program for interpretation.
+* lua - Execution of Lua scripts. The mechanism is built into the plugin and
+does not use an external binary for interpretation.
 * script - Execution of scripts. Takes shebang into account to determine
-which interpreter to use. In this way, not only
-shell scripts, but also scripts in other interpreted languages. By default
-the shell interpreter is used.
+which interpreter to use. In this way, not only shell scripts, but also scripts
+in other interpreted languages can be executed. By default the shell interpreter
+is used.
 
-Users can write their own plugins and use their own characters in the
-klish commands. Installed plugins are located in `/usr/lib`.
-(if configuring the build with --prefix=/usr). Their names are
-`libklish-plugin-<name>.so`, such as `/usr/lib/lib/libklish-plugin-script.so`.
+Users can write their own plugins and use their own symbols in the klish
+commands. Installed plugins are located in `/usr/lib` (if configuring with
+--prefix=/usr). Their names are `libklish-plugin-<name>.so`, such as
+`/usr/lib/lib/libklish-plugin-script.so`.
 
 ![Command Execution](/klish-exec.ru.png "Command Execution")
 
-Symbols are "synchronous" and "asynchronous". Synchronous characters are executed
-in the klishd address space, a separate process is spawned for asynchronous ones.
+Symbols can be "synchronous" or "asynchronous". Synchronous symbols are executed
+in the klishd address space, a separate process is forked for asynchronous ones.
 
-Asynchronous symbols can accept user input (stdin) as input,
-received by the klishd server from the client via the KTP protocol and
-sent to the spawned process within which the asynchronous process is executed
-symbol. In turn, asynchronous symbol can write to stdout, stderr streams.
-The data from these streams is received by the serving server klishd and forwarded to the
-to the client via the KTP protocol.
+Asynchronous symbols can accept user input (stdin) as input, received by the
+klishd server from the client via the KTP protocol and forwarded to the
+forked process created for the asynchronous symbol execution. In turn,
+asynchronous symbol can write to stdout, stderr streams. The data from these
+streams is received by the serving server klishd and forwarded to the client via
+the KTP protocol.
 
-Synchronous characters (with output to stdout, stderr) cannot receive data through the
-stdin input stream, since they are executed within the serving server
+Synchronous characters (with output to stdout, stderr) cannot receive data
+through the stdin input stream, since they are executed within the serving server
 klishd and, for the duration of the symbol code execution, other server functions
-are temporarily stopped. Receiving data from the customer is stopped. The attendant
-klishd server is a single-threaded program, so synchronous characters must be
-use with caution. If the symbol takes too long to execute, then
-the server will hang for that time. In addition, synchronous characters are executed in the
-of the server's address space. This means that the execution of an unreconfigured
-character containing errors may cause the serving server to crash.
-Although a synchronous symbol does not have a stdin input stream, it can use the
-output streams stdout, stderr. To get data from these streams and
-The service server spawns a service server to send them to the client.
-A process that receives and temporarily stores data coming from a symbol. When
-when the symbol execution is completed, the service process forwards the saved data
-back to the serving server, which in turn sends them to the client.
-Synchronous characters are recommended only when the character changes the
-state of the serving server and therefore cannot be executed as part of the
-of another process. For example, section navigation (see Scopes)
-is realized by a synchronous symbol, because the user's position in the section tree
-is stored in the serving server.
+are temporarily stopped. The receiving data from the client is stopped too. The
+serving klishd server is a single-threaded program, so synchronous symbols must
+be used with caution. If the symbol takes too long to execute, then the server
+will hang for that time. In addition, synchronous characters are executed in the
+server's address space. This means that the execution of an symbol containing
+errors may cause the serving server to crash. Although a synchronous symbol does
+not have a stdin input stream, it can use the output streams stdout, stderr. To
+get data from these streams the serving server forks a process. The process
+receives and temporarily stores data coming from a symbol's streams. When the
+symbol execution is completed, the process forwards the saved data back to the
+serving server, which in turn sends them to the client. Synchronous characters
+are recommended only when the symbol changes the state of the serving server
+and therefore cannot be executed as part of the of another process. For example,
+navigation section (see Scopes) is realized by a synchronous symbol, because the
+user's position in the section tree is stored in the serving server.
 
-Lightweight synchronous symbols have no input and output data streams
+Special lightweight synchronous symbols have no input and output data streams
 stdin, stdout, stderr. Due to this, execution of such a symbol does not require
-generation of new processes, as it is done in the case of ordinary synchronous
-symbol, or an asynchronous symbol. Thus a lightweight synchronous symbol
-is executed as quickly as possible. Although the lightweight synchronous symbol does not have a
-of the stdout stream, it can generate an output text string.
-The string is formed manually and, with the help of a special function, is passed to
-to the serving server, which can send it to the client as stdout.
-Otherwise, the lightweight synchronous symbol has the same features as the regular one
-synchronized character. It is recommended to use lightweight synchronous characters
-when the fastest possible execution is required. An example of such a task
-can serve as a prompt for the user. This is a service
-function that is executed every time the user presses the button
-Input. Another example of usage is the function to check whether the
-the argument entered by the user is valid (see PTYPE), as well as functions to
-formation of autocompletion and hints.
+creation of the new processes, as it is done in the case of regular synchronous
+or asynchronous symbols. Thus a lightweight synchronous symbol is executed as
+quickly as possible. Although the lightweight synchronous symbol does not have an
+stdout stream, it can produce an output text string. The string is formed
+manually and, with the help of a special function, is passed to the serving
+server, which can send it to the client. The lightweight synchronous symbol has
+the same features as the regular synchronous symbol. It is recommended to use
+lightweight synchronous characters when the fastest execution is required. An
+example of such a task is generating a prompt for the user. This is a service
+function that is executed every time the user presses the "Enter" key. Another
+example is the function to validate the argument entered by the user (see PTYPE),
+as well as functions to generate autocompletion and help messages.
 
 A symbol, or, more correctly, a klish command, since a command may consist of a
-several consecutively executed characters, may be regular or
-to be a filter. For simplicity, let's assume that the command performs only one
-symbol, and so we will talk about symbols rather than commands. A common symbol
-performs some useful action and, often, produces some output
-text output. And the filter receives as input the result of work, i.e., in this case
-case, the text output of a regular character and processes it. To specify that
-a filter must be applied to an ordinary command, the user uses chains of
-commands separated by "|". In many ways it is similar to chains in the standard
-a custom shell.
+several consecutively executed characters, may be regular or to be a filter. For
+simplicity, let's assume that the command performs only one symbol, and so we
+will talk about symbols rather than commands. A common symbol performs some
+useful action and, often, produces some text output. But the filter receives the
+output of common symbol and processes it. To specify that a filter must be
+applied to an ordinary command, the user uses chains of commands separated by
+the "|" character. In many ways it is similar to pipes in the standard shell.
 
 ![Filters](/klish-filters.ru.png "Filters")
 
-Synchronous symbols have no stdin input stream, i.e., they do not receive an input of
-no data and therefore cannot be full-fledged filters, but can be
-be used only as the first command in a chain of commands. Lightweight
-synchronous characters do not have and output stream stdout, so they cannot be
-use not only as filters, but also as the first place team in the chain of command
-commands, because the filter will not be able to get any data from them. Typical
-the use of lightweight synchronous characters are service internal functions,
-that do not interact directly with the user and are not used in chains
-commands.
+Synchronous symbols have no stdin stream, i.e. they do not receive an input data
+and therefore cannot be full-fledged filters, but can be used only as the first
+command in a chain of commands. Lightweight synchronous characters do not have
+and output stream stdout, so they cannot be used not only as filters, but also as
+the first command in the chain, because the filter will not be able to get any
+data from them. Typical the use of lightweight synchronous characters are service
+internal functions, that do not interact directly with the user and are not used
+in command chains.
 
 The first command in the command chain receives stdin stream input data from
-user, if required. Let's call the stdin stream from the user -
-by the global stdin stream. Then the stdout stream of the previous character in the chain
-is received at the input of the stdin stream of the next character. Output stream stdout
-The last character in the chain is considered to be global and is sent to the servicer.
-to the server and then to the user.
+user. Let's call this stream "global stdin". Then the stdout stream of the
+previous symbol in the chain is forwarded to the input of the the next symbol.
+The last symbol in the chain produces "global stdout" that is sent to the
+serving server and then to the client.
 
-Any character in the chain has the ability to write to the stderr stream. The entire chain
-a single stderr stream, i.e. one for all symbols. This stream is considered to be global
-stderr and is sent to the serving server and then to the user.
+Any symbol in the chain has the ability to write to the stderr stream. The entire
+chain has a single stderr stream, i.e. one for all symbols. This stream is
+considered to be "global stderr" and is sent to the serving server and then to
+the client.
 
-The number of commands in the command chain is unlimited. The klish command must be
-is declared as a filter so that it can be used after the "|" sign.
+The number of commands in the command chain is unlimited. The klish command must
+be declared as a filter to be used after the "|" character.
 
 
 ## KTP Protocol
 
-KTP (Klish Transfer Protocol) is used for client interaction
-klish with service
-by the klishd server. The main task is to transfer commands and user input
-from the client to the server, transmitting the text output of the executed command and status
-of command execution - in the opposite direction. In addition, the protocol provides for
-means for the client to obtain autocomplete options from the server for the
-incomplete commands and hints for commands and parameters.
+The KTP (Klish Transfer Protocol) is used for the interaction beetween klish
+client and klishd server. The main task is to transfer commands and user input
+from the client to the server, transmitting the text output of the executed
+command and status of command execution - in the opposite direction. In addition,
+the protocol is used to get autocompletion and help strings from the server. The
+autocompletion can be used for the incomplete commands and parameters.
 
-The KTP protocol is implemented by means of the libfaux library, which simplifies the
-creation of a specialized network protocol on the basis of a generalized template
-network protocol. The protocol is built on top of a streaming socket. Currently in the project
-klish uses UNIX sockets for client-server communication.
+The KTP protocol is implemented by means of the libfaux library, which simplifies
+the creation of a specialized network protocol on the basis of a generalized
+template network protocol. The protocol is built on top of the stream socket.
+Currently klish uses UNIX sockets for client-server communication.
 
-A KTP protocol packet consists of a fixed-length header and a set of
+The KTP protocol packet consists of a fixed-length header and a set of
 "parameters". The number of parameters is stored in a special header field.
-Each parameter has its own little header that specifies the type of parameter and the
-its length. Thus, at the beginning of a KTP packet is the KTP header, followed by the KTP
-first parameter header, first parameter data, second parameter header
-parameter, data of the second parameter, etc. All fields in the headers are passed with
-using network (big-endian) byte order.
+Each parameter has its own little header that specifies the type of parameter and
+its length. So the KTP header is followed by the KTP first parameter header,
+first parameter data, second parameter header, second parameter data, etc. All
+fields in the headers are passed with using network (big-endian) byte order.
 
-KTP header:
+The KTP header:
 
-|Size, bytes |Field name                                   |Field value|
+|Size, bytes |Field name                                   |Value      |
 |------------|---------------------------------------------|-----------|
 |4           |Magic number                                 |0x4b545020 |
 |1           |Protocol version (major)                     |0x01       |
 |1           |Protocol version (minor)                     |0x00       |
 |2           |Command code                                 |           |
 |4           |Status                                       |           |
-|4           |Not used                                     |           |
+|4           |Reserved                                     |           |
 |4           |Number of parameters                         |           |
 |4           |The length of the entire packet (with header)|           |
 
-Command codes:
+The command codes:
 
-|Code|Name          |Direction|Description                                  |
-|----|--------------|---------|---------------------------------------------|
-|'i' |STDIN         |->       |stdin user input (PARAM_LINE)                |
-|'o' |STDOUT        |<-       |stdout command output (PARAM_LINE)           |
-|'e' |STDERR        |<-       |stderr command output (PARAM_LINE)           |
-|'c' |CMD           |->       |Execute command (PARAM_LINE)                 |
-|'C' |CMD_ACK       |<-       |The result of the command                    |
-|'v' |COMPLETION    |->       |Request for autocompletion (PARAM_LINE)      |
-|'V' |COMPLETION_ACK|<-       |Possible additions (PARAM_PREFIX, PARAM_LINE)|
-|'h' |HELP          |->       |Prompt (PARAM_LINE)                          |
-|'H' |HELP_ACK      |<-       |Hint (PARAM_PREFIX, PARAM_LINE)              |
-|'n' |NOTIFICATION  |<->      |Asynchronous message (PARAM_LINE)            |
-|'a' |AUTH          |->       |Authentication Request                       |
-|'A' |AUTH_ACK      |<-       |Authentication Confirmation                  |
-|'I' |STDIN_CLOSE   |->       |stdin was closed                             |
-|'O' |STDOUT_CLOSE  |->       |stdout was closed                            |
-|'E' |STDERR_CLOSE  |->       |stderr was closed                            |
+|Code|Name          |Direction|Description                                    |
+|----|--------------|---------|-----------------------------------------------|
+|'i' |STDIN         |->       |stdin user input (PARAM_LINE)                  |
+|'o' |STDOUT        |<-       |stdout command output (PARAM_LINE)             |
+|'e' |STDERR        |<-       |stderr command output (PARAM_LINE)             |
+|'c' |CMD           |->       |Command to execute (PARAM_LINE)                |
+|'C' |CMD_ACK       |<-       |The result of the command execution            |
+|'v' |COMPLETION    |->       |Request for autocompletion (PARAM_LINE)        |
+|'V' |COMPLETION_ACK|<-       |Possible completions (PARAM_PREFIX, PARAM_LINE)|
+|'h' |HELP          |->       |Prompt (PARAM_LINE)                            |
+|'H' |HELP_ACK      |<-       |Help (PARAM_PREFIX, PARAM_LINE)                |
+|'n' |NOTIFICATION  |<->      |Asynchronous notification (PARAM_LINE)         |
+|'a' |AUTH          |->       |Authentication Request                         |
+|'A' |AUTH_ACK      |<-       |Authentication Confirmation                    |
+|'I' |STDIN_CLOSE   |->       |stdin was closed                               |
+|'O' |STDOUT_CLOSE  |->       |stdout was closed                              |
+|'E' |STDERR_CLOSE  |->       |stderr was closed                              |
 
-The "Direction" column shows in which direction the command is transmitted. Arrow
-right arrow means transfer from client to server, left arrow means transfer from server
-to the client. In the "Description" column in brackets are the names of parameters in which
-data is being transmitted.
+The "Direction" column shows in which direction the packet is transmitted.
+The right arrow means transfer from the client to the server, left arrow means
+transfer from the server to the client. In the "Description" column in brackets
+are the names of parameters in which data is being transmitted.
 
-The status field in the KTP header is a 32-bit field. Bit values
-status fields:
+The status field in the KTP header is a 32-bit value. Bit values are:
 
 |Bit Mask  |Bit Name          |Value                                        |
 |----------|------------------|---------------------------------------------|
 |0x00000001|STATUS_ERROR      |Error                                        |
-|0x00000002|STATUS_INCOMPLETED|Command execution not completed              |
-|0x00000100|STATUS_TTY_STDIN  |stdin client is terminal                     |
-|0x00000200|STATUS_TTY_STDOUT |stdout client is terminal                    |
-|0x00000400|STATUS_TTY_STDERR |stderr client is a terminal                  |
+|0x00000002|STATUS_INCOMPLETED|Command execution is not completed           |
+|0x00000100|STATUS_TTY_STDIN  |client's stdin is terminal                   |
+|0x00000200|STATUS_TTY_STDOUT |client's stdout is terminal                  |
+|0x00000400|STATUS_TTY_STDERR |client's stderr is a terminal                |
 |0x00001000|STATUS_NEED_STDIN |Command accepts user input                   |
 |0x00002000|STATUS_INTERACTIVE|The output of the command is for the terminal|
-|0x00010000|STATUS_DRY_RUN    |Idle start. Don't execute the command        |
-|0x80000000|STATUS_EXIT       |Ending session                               |
+|0x00010000|STATUS_DRY_RUN    |Dry-run, don't actually execute the command  |
+|0x80000000|STATUS_EXIT       |End of session                               |
 
 Parameter header:
 
 |Size, bytes|Field name                            |
 |-----------|--------------------------------------|
 |2          |Parameter type                        |
-|2          |Not used                              |
+|2          |Reserved                              |
 |1          |Parameter data length (without header)|
 
 Parameter types:
@@ -358,53 +347,51 @@ Parameter types:
 |Code|Name         |Direction|Description                               |
 |----|-------------|---------|------------------------------------------|
 |'L' |PARAM_LINE   |<->      |String. Multifunctional                   |
-|'P' |PARAM_PREFIX |<-       |String. For autocomplete and hint         |
+|'P' |PARAM_PREFIX |<-       |String. For autocomplete and help         |
 |'$' |PARAM_PROMPT |<-       |String. User prompt                       |
 |'H' |PARAM_HOTKEY |<-       |Function key and its meaning              |
 |'W' |PARAM_WINCH  |->       |The size of the user window. When changing|
 |'E' |PARAM_ERROR  |<-       |String. Error message                     |
 |'R' |PARAM_RETCODE|<-       |Return code of the executed command       |
 
-From the server to the client, along with the command and the parameters corresponding to the command,
-can be passed additional parameters. For example, with the CMD_ACK command,
-that reports the completion of a user command can be sent to the
-PARAM_PROMPT parameter, which tells the client that the user's
-the invitation has changed.
+The additional parameters can be send from the server to the client. For example,
+together with the CMD_ACK command, that reports the completion of the command the
+PARAM_PROMPT parameter can be send, which tells the client that the user's
+prompt has been changed.
 
 
 ## XML configuration structure
 
-The main way to describe klish commands today is XML files.
-In this section, all examples will be based on XML elements.
+The main way to describe klish commands is XML files. In this section, all
+examples will be based on the XML elements.
 
 
 ### Visibility areas
 
-Commands are organized into "scopes" called VIEWs. That is, each command
-belongs to a VIEW and is defined in it. When working in klish always
-there is a "current path". By default, when starting klish the current path is
-is assigned to a VIEW named "main". The current path determines which commands are currently
-are visible to the operator at the moment. The current path can be changed
-[navigation commands](#navigation). For example
-go to a "neighboring" VIEW, then the current path will be this neighboring VIEW,
-displacing the old one. Another possibility is to "go deep inside", i.e. to go into a nested
-VIEW. The current path will then become a two-level path, similar to how you can enter a
-subdirectory in the file system. When the current path has more than one
-level, the operator has access to the commands of the "deepest" VIEW, as well as commands of all the
-of the above levels. You can use navigation commands to exit from nested levels
-levels. When the current path is changed, the navigation command used determines whether the
-whether the VIEW of the current path is superseded by another VIEW at the same nesting level, or
-the new VIEW will become nested and another level will appear in the current path. The way
-VIEWs defined in XML files do not affect whether a VIEW can be nested.
+Commands are organized into "scopes" called VIEWs. That is, each command belongs
+to a VIEW and is defined in it. When working in klish always there is a "current
+path". By default, when starting the current path is assigned to a VIEW named
+"main". The current path determines which commands are currently are visible to
+the operator at the moment. The current path can be changed by the
+[navigation commands](#navigation). For example while going to the "neighboring"
+VIEW, the current path will be replaced by this neighboring VIEW. Another
+possibility is to "go deeper inside", i.e. to get into a nested VIEW. The current
+path will become a two-level path, similar to how you can enter an subdirectory
+in the file system. When the current path has more than one level, the operator
+has access to the commands of the "deepest" VIEW, as well as commands of all
+higher level VIEWs. You can use navigation commands to exit from nested levels.
+Navigation command can control whether the current level VIEW will be superseded
+by another VIEW or nested level will be created. The way VIEWs defined in XML
+files do not affect whether a VIEW can be nested.
 
 When defining VIEWs in XML files, some VIEWs can be nested within other VIEWs.
-This nesting should not be confused with the nesting when the current path is formed.
-A VIEW defined within another VIEW adds its commands to the commands of the
-of the parent VIEW, but can also be addressed separately from the parent VIEW.
-In addition to this, there are references to VIEWs. By declaring such a link inside a VIEW, we
-add the commands of the referenced VIEW to the commands of the current VIEW
-VIEW. You can define a VIEW with "standard" commands and include a reference to the
-this VIEW into other VIEWs that require these commands without redefining them.
+This nesting should not be confused with the nesting when the current path is
+formed. A VIEW defined within another VIEW adds its commands to the commands of
+the parent VIEW, but can also be addressed separately from the parent VIEW.
+In addition to this, there are references to VIEWs. By declaring such a link
+inside a VIEW, we add the commands of the referenced VIEW to the commands of the
+current VIEW. You can define a VIEW with "standard" commands and include the
+reference into other VIEWs that require these commands without redefining them.
 
 In XML configuration files, the `VIEW` tag is used to declare a VIEW.
 
@@ -1542,8 +1529,6 @@ The `order` attribute is used in the `PARAM` element.
 
 
 #### Attribute `filter`
-
-> Attention: Filters are not working yet.
 
 Some commands are filters. This means that they cannot
 to be used independently. Filters only process the output of other commands.

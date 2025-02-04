@@ -552,14 +552,15 @@ the server.
 ### Item references
 
 Some tags have attributes that are references to other tags that are defined
-In configuration files, elements. For example, `VIEW` has a `ref` attribute, with the help of the
-which creates a "copy" of the third-party `VIEW` at the current location in the schema. Or the tag
-`PARAM` has a `ptype` attribute, which is used to refer to `PTYPE`, defining the
-parameter type. Klish has its own "language" for organizing references. You can
-to say it is a highly simplified analog of file system paths or XPath.
+in the configuration files. For example, `VIEW` has a `ref` attribute, which
+allows to create a "copy" of the another `VIEW` at the current location in the
+schema. Or the tag `PARAM` has a `ptype` attribute, which is used to refer to
+`PTYPE`, actually defining the parameter type. Klish has its own "language" for
+organizing references. You can to say it is a highly simplified analog of file
+system paths or XPath.
 
-The path to an element in klish is typed by specifying all of its parent elements with the
-separator `/`. The name of an element is the value of its `name` attribute. Path
+The path to an element in klish is a set of all its parent elements with the
+`/` separator. The name of an element is the value of its `name` attribute. Path
 also starts with the `/` character, indicating the root element.
 
 > Relative paths are not supported at this time
@@ -590,43 +591,42 @@ also starts with the `/` character, indicating the root element.
 </KLISH>
 ```
 
-The "par1" parameter references `PTYPE` using the path `/PTYPE1`. Type names
-It is customary to designate types with capital letters to make it easier to distinguish them from other types.
-elements. Here the type is defined at the topmost level of the schema. Basic types
-are usually defined that way, but `PTYPE` does not have to be at the top level and
-can be nested in `VIEW` or even `PARAM`. In this case it will have
-a more difficult path.
+The "par1" parameter references `PTYPE` using the path `/PTYPE1`. Use capital
+letters for the TYPE names to make it easier to distinguish them from other tag
+names. Here the type is defined at the topmost level of the schema. Basic types
+are usually defined that way, but `PTYPE` does not have to be at the top level
+and can be nested in `VIEW` or even `PARAM`. In this case it will have a more
+complex path.
 
-A `VIEW` named "view2" imports commands from a `VIEW` named "view1_2",
-Using the path `/view1/view1_2`.
+A `VIEW` named "view2" imports commands from a `VIEW` named "view1_2", using the
+path `/view1/view1_2`.
 
-If, suppose, we need a reference to the parameter "par1", the path will look like this
-like this - `/view1/view1_2/cmd1/par1`.
+If we need a reference to the parameter "par1", the path will look like this
+- `/view1/view1_2/cmd1/par1`.
 
 The following elements cannot be referenced. They do not have a path:
 
-* `KLISH
+* `KLISH`
 * `PLUGIN`
 * `HOTKEY`
 * `ACTION`
 
-> Do not confuse [current session path](#visibility-areas) with the path to create a
-> links. The path uses the internal structure of the schema when creating links,
-> specified when the configuration files are written. This is the path of the element within the schematic,
-> uniquely identifying it. This is a static path. Nesting of elements
-> in defining the schema only generates the necessary instruction sets, this nesting
-> is not visible to the operator and is not a nesting in terms of its work with the
-> command line. It only sees ready-made line sets of commands.
+> Do not confuse [current session path](#visibility-areas) with the path to
+> create a links. The path uses the internal structure of the schema when
+> creating links, it's specified when the configuration files are written. This
+> is the path of the element within the schema, uniquely identifying it. This is
+> a static path. Nesting of elements in the schema only defines the necessary
+> instruction sets, this nesting is not visible to the operator and is not a
+> nesting in terms of its work with the command line. The operator sees
+> ready-made sets of commands.
 >
-> The current session path is dynamic. It
-> is formed by operator commands and implies the possibility to go deeper, i.e.
-> add another level of nesting to the path and access the
-> an additional set of commands, or go higher. With
-> the current path, you can combine the linear paths created at the schematic writing stage.
-> command sets. Navigation commands also allow you to completely replace the current
-> command set to another by changing `VIEW` at the current path level. Thus,
-> the existence of the current session path may create visibility for the operator
-> a branching tree of configuration.
+> The current session path is dynamic. It is formed by operator commands and
+> implies the possibility to go deeper, i.e. add another level of nesting to the
+> path and access the additional set of commands, or go higher. Navigation
+> commands also allow you to completely replace the current command set to
+> another by changing `VIEW` at the current path level. Thus, the existence of
+> the current session path can provide visibility of a branching configuration
+> tree for the operator.
 
 
 ## Tags

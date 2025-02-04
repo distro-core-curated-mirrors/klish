@@ -602,7 +602,7 @@ A `VIEW` named "view2" imports commands from a `VIEW` named "view1_2", using the
 path `/view1/view1_2`.
 
 If we need a reference to the parameter "par1", the path will look like this
-- `/view1/view1_2/cmd1/par1`.
+`/view1/view1_2/cmd1/par1`.
 
 The following elements cannot be referenced. They do not have a path:
 

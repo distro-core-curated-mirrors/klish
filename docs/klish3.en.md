@@ -398,161 +398,155 @@ In XML configuration files, the `VIEW` tag is used to declare a VIEW.
 
 ### Commands and parameters
 
-Commands (tag `COMMAND`) can have parameters (tag `PARAM`). A command is defined by
-within a VIEW and belongs to it. Parameters are defined within the command
-and, in turn, belong to it. A command can consist of only one word,
-unlike the commands in klish of previous versions. If you want to define a verbose
-command, then nested commands are created. I.e. within the command identified by
-the first word of a verbose command, a command identified by the
-to the second word of a verbose command, etc.
+Commands (tag `COMMAND`) can have parameters (tag `PARAM`). A command is defined
+within a VIEW and belongs to it. Parameters are defined within the command and,
+in turn, belong to COMMAND. A command name can consist of only one word, unlike
+the commands in klish of previous versions. If you want to define a command
+consist of several words, then nested commands must be created. I.e. the command
+identified by the second word must be defined inside the command identified by
+the first word, etc.
 
-Strictly speaking, a command differs from a parameter only in that its value can be
-can only be a predefined word, while the value of a parameter can be
-be anything. Only the type of the parameter determines its possible values. Thus
-so the command can be thought of as a parameter with a type that says
-that the valid value is the parameter name itself. Internal implementation
-teams are exactly like that.
+Strictly speaking, a command differs from a parameter only in that its value can
+be a predefined word, while the value of a parameter can be anything you want.
+Only the type of the parameter determines its possible values. So the command
+can be thought of as a parameter with a type that says that the valid value is
+the parameter's name itself. Internal command implementation are exactly like
+that.
 
-In general, a parameter can be defined directly in VIEW rather than internally
-teams, but this is more of an atypical case.
+In general, a parameter can be defined directly in VIEW rather than in COMMAND,
+but this is an unusual case.
 
-Like VIEW, commands and parameters can be references. In this case, the reference can be
-consider it simply as a substitution of the object pointed to by the reference.
+Like VIEW, commands and parameters can be references. In this case, the reference
+can be considered simply as a substitution of the object pointed to by the
+reference.
 
-Parameters can be mandatory, optional, or mandatory
-selection among several candidate parameters. Thus, when entering the command
-some parameters may be specified by the operator and some may not. When parsing
-The command line is used to compose a sequence of selected parameters.
+Parameters can be mandatory, optional, or mandatory selection among several
+candidate parameters. Thus, the operator can specify some parameters and don't
+specify the others.
 
 
 ### Parameter type
 
-The type of a parameter defines the allowed values of that parameter. Usually types
-are defined separately using the `PTYPE` tag, and the parameter refers to a specific
-type by its name. The type can also be defined directly inside the parameter, but this is
-is not a typical case, since standard types can cover most of the
-Needs.
+The type of a parameter defines the allowed values of that parameter. Usually
+types are defined separately using the `PTYPE` tag, and the parameter refers to a
+specific type by its name. The type can also be defined directly inside the
+parameter, but this is not a typical case, since standard types can cover most of
+the needs.
 
-The PTYPE type, like a command, performs a specific action specified by the tag
-`ACTION`. The action specified for the type checks the value entered by the operator
-parameter and returns the result - success or error.
+The PTYPE, like a command, performs a specific action specified by the tag
+`ACTION`. The action specified for the type validates the value entered by the
+operator and returns the result - success or error.
 
 
 ### Action
 
 Each command must define the action to be performed when that command is entered
-operator. The action can be a single action, or multiple actions for a single command.
-The action is declared with the `ACTION` tag inside the command. ACTION specifies a reference
-to the symbol (function) from the function plugin that will be executed in this case.
-All data inside the ACTION tag is available to the symbol. The symbol can at its own discretion
-use this information. As data, for example, it can be set to
+by the operator. The action can be a single action, or multiple actions for a
+single command. The action is declared with the `ACTION` tag inside the command.
+ACTION specifies a reference to the symbol (function) from the function plugin
+that will be executed. All data inside the ACTION tag is available to the symbol.
+The symbol can use this information as he wants. For example, it can be used as a
 script to be executed by the symbol.
 
-The result of the action is a "return code". It defines the success
-or failure to execute the command as a whole. If a command is defined for one command
-more than one action, then calculating the return code becomes more complex
-Task. Each action has a flag that determines whether the return code affects the
-of the current action to a common return code. Actions also have settings,
-determining whether the action will be executed if the previous action is executed
-ended with an error. If several actions are performed sequentially,
-that have an influence flag on the common return code, then the common return code will be the code
-the return of the last such action.
+The result of the action is a "return code". It defines the success or failure
+while whole COMMAND execution. If a COMMAND contains multiple ACTIONs then
+return code calculating becomes more complex task. Each action has a flag that
+determines whether the return code of current action affects the general return
+code. Actions also have settings, determining whether the action will be executed
+if the previous action has returned the error. If several actions can influence
+a general return code and are performed sequentially, then the general return
+code will be the return code of the last such action.
 
 
 ### Filters
 
-Filters are commands that process the output of other commands.
-The filter can be specified on the command line after the main command and the `|` sign.
-The filter cannot be a stand-alone command and can be used without the main
-commands. An example of a typical filter is the UNIX analog of the `grep` utility.
-Filters can be used one after the other, with a `|` separator like this
-is done in the shell.
+Filters are commands that process the output of other commands. The filter can be
+specified on the command line after the main command and the `|` character. The
+filter cannot be a stand-alone command and can't be used without the main
+command. An example of a typical filter is the analog of the `grep` utility.
+Filters can be used one after the other, with a `|` separator like this is done
+in the shell.
 
-If the command is not a filter, it cannot be used after the character
-`|`.
+If the command is not a filter, it cannot be used after the `|` character.
 
 The filter is specified in the configuration files using the `FILTER` tag.
 
 
 ### Parameter Containers
 
-SWITCH and SEQ containers are used to aggregate nested parameters and
-define the rules by which the command line is parsed with respect to
-of these parameters.
+SWITCH and SEQ containers are used to aggregate nested parameters and define the
+rules by which the command line is parsed with respect to these parameters.
 
-By default, it is assumed that if a command is defined sequentially within a command
-several parameters, then all these parameters must also be consistently
-to be present on the command line. However, sometimes there is a need for
-the operator has entered only one parameter of his choice from the set of possible parameters.
-In such a case, the SWITCH container can be used. If, when parsing a command
-SWITCH container is found inside the command, then to match the
-only one parameter must be selected for the next word entered by the operator
-from the parameters nested in SWITCH. I.e. with the help of the SWITCH container there is
-branching parsing.
+By default, it is assumed that if a several parameters are defined sequentially
+within a command, then all these parameters must sequentially present on the
+command line. However, sometimes there is a need to select only one parameter
+from the set of possible parameters. In such a case, the SWITCH container can be
+used. If SWITCH container is found inside the command, then to match the
+conditions only one parameter must be selected from set of SWITCH's nested
+perameters. I.e. with the help of the SWITCH container you can implement a
+branching.
 
 The SEQ container defines a sequence of parameters. All of them must be
-are consistently mapped to the command line. Although, as noted earlier,
-The parameters nested in the command are already parsed sequentially, however
-The container may be useful in more complex designs. For example, a container
-The SEQ itself can be an element of a SWITCH container.
+sequentially specified at the command line. Although, as noted earlier, the
+parameters nested in the command are already parsed sequentially, however the
+container may be useful in more complex cases. For example, a SEQ container
+itself can be an element of a SWITCH container.
 
 
-### Command line invitations
+### Command line prompt
 
-To generate the command line prompt that the operator sees,
-The `PROMPT` construct is used. The PROMPT tag must be nested inside a VIEW.
-Different VIEWs can have different invitations. I.e. depending on the current
-paths, the operator sees a different invitation. The invitation can be dynamic
-and generated by the `ACTION` actions specified within PROMPT.
+To generate the command line prompt that the operator sees, the `PROMPT` tag
+is used. The PROMPT tag must be nested inside a VIEW. Different VIEWs can have
+different prompts. I.e. depending on the current path, the operator sees a
+different prompt. The prompt can be dynamic and generated by the ACTION
+specified within PROMPT tag.
 
 
-### Autocomplete and tips
+### Autocompletion and help
 
-For operator convenience, commands and parameters can be realized for commands and parameters
-hints and autocomplete. Hints (help), which explain the purpose of and
-format of possible parameters, are displayed in the klish client by pressing the key
-`?`. The list of possible additions is printed when the operator presses the `Tab` key.
+For operator convenience, commands and parameters can be autocompleted and have
+a help strings. Help strings explain the purpose and format of parameters, are
+displayed in the klish client by pressing the `?` key. The list of possible
+completions is printed when the operator presses the `Tab` key.
 
-To set hints and a list of possible add-ons in the configuration, the following are used
-`HELP` and `COMPL` tags. These tags must be nested relative to
-of the corresponding commands and parameters. For simplicity, the prompts for a parameter or
-commands can be specified by the main tag attribute if the hint is a
-is static text and does not need to be generated. If the tooltip is dynamic, then
-its contents are generated by ACTION actions nested inside HELP. For
-of COMPL additions of ACTION actions generate a list of possible values
-parameters separated by a line feed.
+To set help strings and a list of possible completions in the configuration,
+the tags `HELP` and `COMPL` are used. These tags must be nested to the
+corresponding commands and parameters. If help string is static, it can be
+specified by the parent tag attribute. If the string is dynamic, then its
+content is generated by ACTION nested inside HELP tag. The entries of completion
+list generated by COMPL tag must be separated by a line feed.
 
 
 ### Conditional element
 
 Commands and parameters can be hidden from the operator based on dynamic
-conditions. A condition is specified using a `COND` tag nested inside a `COND` tag
-of the corresponding command or parameter. Within a COND are one or more
-ACTION actions. If the ACTION return code is `0`, i.e. success, the parameter is available
-operator. If ACTION returned an error, the element will be hidden.
+conditions. A condition is specified using a `COND` tag nested inside a `COND`
+tag of the corresponding command or parameter. Within a COND are one or more
+ACTIONs. If the ACTION return code is `0`, i.e. success, the parameter is
+available to operator. If ACTION returned an error, the element will be hidden.
 
 
 ### Plugin
 
-The klishd process does not load all existing feature plugins in a row, but only the
+The klishd process doesn't load all existing function plugins, but only the
 those specified in the configuration using the `PLUGIN` tag. Data inside the tag
-may be interpreted by the plugin initialization function as it sees fit,
-particularly as a configuration for a plugin.
+may be interpreted by the plugin initialization function, particularly as a
+plugin configuration.
 
 
 ### Hotkeys
 
-For the operator's convenience, "hot keys" can be set in the klish command configuration.
-keys". The tag for specifying hotkeys is `HOTKEY`. List of hotkeys
-is passed by the klishd server to the client. It is at the discretion of the client to use this
-information or does not use it. For example, for an automated control client
-hotkey information is meaningless.
+For the operator's convenience, "hot keys" can be set in the klish configuration.
+The tag for specifying hotkeys is `HOTKEY`. List of hotkeys is passed by the
+klishd server to the client. The client's decision is to use this information or
+don't. For example, for an automated control client the hotkey information is
+meaningless.
 
-When defining a hotkey, a text command is specified, which should
-be executed when a hotkey is pressed by the operator. This can be a quick
-display the current device configuration, exit the current VIEW, or any other
-command. The klish client "catches" hotkey presses and transmits them to the server
-command corresponding to the pressed hotkey.
+When defining a hotkey, a text command is specified, which should be executed
+when the hotkey is pressed by the operator. This can be a quick display the
+current device configuration, exit the current VIEW, or any other command. The
+klish client "catches" hotkey presses and transmits corresponding command to
+the server.
 
 
 ### Item references

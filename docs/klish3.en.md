@@ -634,8 +634,8 @@ The following elements cannot be referenced. They do not have a path:
 
 ### KLISH
 
-Any klish configuration XML file must begin with an opening `KLISH` tag
-and end with a closing tag `KLISH`.
+Any klish configuration XML file must begin with an opening `KLISH` tag and end
+with a closing tag `KLISH`.
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -650,20 +650,19 @@ and end with a closing tag `KLISH`.
 ```
 
 The header introduces its default XML namespace
-"https://klish.libcode.org/klish3". The header is standard and more often than not makes no sense
-to change it.
+"https://klish.libcode.org/klish3". The header is standard and there is no
+reason to change it.
 
 
 ### PLUGIN
 
-On its own, klish does not load any executable function plugins.
-Accordingly, no characters are available to the user for use in the
-ACTION. Plugin loading should be explicitly written in the files
-configurations. The `PLUGIN` tag is used for this purpose.
+On its own, klish does not load any executable function plugins. Accordingly, no
+symbols are available to the user for use in the ACTION. Plugin loading should
+be explicitly configured. The `PLUGIN` tag is used for this purpose.
 
-Note that even the base plugin named "klish" also fails to load
-automatically and it must be specified in the configuration files. In this plugin, in
-In particular, navigation is implemented. A typical configuration will contain a string:
+Note that even the base plugin named "klish" also must be specified in the
+configuration files. Navigation is implemented in this plugin. A typical
+configuration will contain the following line:
 
 ```
 <PLUGIN name="klish"/>
@@ -674,9 +673,10 @@ The `PLUGIN` tag cannot contain other nested tags.
 
 #### Attribute `name`
 
-The attribute defines the name by which the plugin will be recognized within the files
-configurations. When `ACTION` refers to a character, it can be specified simply as follows
-symbol name, and can be specified in which plugin to look for the symbol.
+The attribute defines the name by which the plugin will be identified within
+the configuration files. When `ACTION` refers to a symbol, it can be specified
+simply as follows symbol name, and can be specified in which plugin to look for
+the symbol.
 
 ```
 <ACTION sym="my_sym"\>
@@ -684,23 +684,23 @@ symbol name, and can be specified in which plugin to look for the symbol.
 <ACTION sym="my_sym@my_plugin"\>
 ```
 
-In the first case, klish will search for "my_sym" in all plugins and use the first one
-found. In the second case the search will be performed only in the plugin
-"my_plugin". In addition, different plugins may contain the same characters and
-specifying the plugin will let you know which character was meant.
+In the first case, klish will search for "my_sym" in all plugins and use the
+first one found. In the second case the search will be performed only in the
+"my_plugin" plugin. In addition, different plugins may contain the same symbols
+and specifying the plugin will let you know which symbol was meant.
 
 If the `id` and `file` attributes are not specified, `name` is also used to
-formation of the plugin file name. The plugin must have the name `kplugin-<name>.so` and
-is located in the `/usr/lib/klish/plugins` directory (if klish has been configured with the
-with `--prefix=/usr`).
+format the plugin file name. The plugin must have the name `kplugin-<name>.so`
+and is located in the `/usr/lib/klish/plugins` directory (if klish has been
+configured with the `--prefix=/usr`).
 
 
 #### Attribute `id`
 
-The attribute is used to form the plugin file name if no attribute is specified
-`file`. The plugin must have the name `kplugin-<id>.so` and be located in the directory
-`/usr/lib/klish/plugins` (if klish has been configured with
-with `--prefix=/usr`).
+The attribute is used to form the plugin file name if no `file` attribute is
+specified. The plugin must have the name `kplugin-<id>.so` and be located in the
+directory `/usr/lib/klish/plugins` (if klish has been configured with
+`--prefix=/usr`).
 
 If the `id` attribute is specified, `name` will not be used to generate the
 plugin file name, but only for identification within configuration files.
@@ -714,13 +714,12 @@ plugin file name, but only for identification within configuration files.
 
 #### Attribute `file`
 
-The full name of the plug-in (shared library) file can be specified explicitly
-Type. If the `file` attribute is specified, no other attributes will be specified
-will be used to form the plugin file name, and the value of
-`file` "as is" and passed to the dlopen() function. This means that there can be
-either an absolute path or just a file name, but in this case the file
-must be located along the standard paths used when searching for a shared
-libraries.
+The full name of the plugin (shared library) file can be specified explicitly.
+If the `file` attribute is specified, no other attributes will be used to form
+the plugin file name, and the value of `file` will be passed "as is" to the
+dlopen() function. This means that there can be either an absolute path or just
+a file name, but in this case the file must be located at the standard paths
+used when searching for a shared libraries.
 
 ```
 <PLUGIN name="my_plugin" file="/home/ttt/my_plugin.so"/>
@@ -731,9 +730,9 @@ libraries.
 
 #### Data inside the tag
 
-The data inside the `PLUGIN` tag can be processed by the initialization function
-plugin. The format of the data is left to the discretion of the plugin itself. For example,
-settings for the plug-in can be specified as data.
+The data inside the `PLUGIN` tag can be processed by the plugin's initialization
+function. The format of the data is left to the discretion of the plugin itself.
+For example, settings for the plugin can be specified.
 
 ```
 <PLUGIN name="sysrepo">
@@ -747,12 +746,11 @@ settings for the plug-in can be specified as data.
 
 ### HOTKEY
 
-To make it easier to work in the command line interface, for commonly used
-hotkeys can be set for commands. A hot key is defined with
-using the `HOTKEY' tag.
+To make it easier to work in the command line interface, the hotkeys can be
+set for commonly used commands. A hotkey is defined with using the `HOTKEY` tag.
 
-Hotkeys require support in the client program to work, which is
-connects to the klishd server. The klish client has this support.
+Hotkeys require support in the client program to work. The klish client has
+such support.
 
 The `HOTKEY` tag cannot have nested tags. Any additional data
 within the tag are not provided.
@@ -760,9 +758,9 @@ within the tag are not provided.
 
 #### Attribute `key`
 
-The attribute defines what the operator must press to activate the hot
-keys. Combinations with the "Ctrl" key are supported. For example `^Z` means,
-that the "Ctrl" and "Z" key combination must be pressed.
+The attribute defines what key the operator must press to activate the command.
+Combinations with the "Ctrl" key are supported. For example `^Z` means, that the
+"Ctrl" and "Z" key combination must be pressed.
 
 ```
 <HOTKEY key="^Z" cmd="exit"\>
@@ -771,9 +769,9 @@ that the "Ctrl" and "Z" key combination must be pressed.
 
 #### Attribute `cmd`
 
-The attribute defines what action will be performed when the operator is pressed
-hotkey. The `cmd` attribute value is parsed according to the same rules as
-any other command manually entered by the operator.
+The attribute defines what command will be performed when the operator press the
+hotkey. The `cmd` attribute value is parsed according to the same rules as any
+other command manually entered by the operator.
 
 ```
 <COMMAND name="exit" help="Exit view or shell">
@@ -783,40 +781,41 @@ any other command manually entered by the operator.
 <HOTKEY key="^Z" cmd="exit"\>
 ```
 
-The command used as the value of the `cmd` attribute must be defined
-in the configuration files. This example will execute the previously defined command
+The command used as the value of the `cmd` attribute must be defined in the
+configuration files. This example will execute the previously defined command
 `exit` when the "Ctrl^Z" keyboard shortcut is pressed.
 
 
 ### ACTION
 
-The `ACTION` tag specifies the action to be performed. Typical
-tag usage - inside the `COMMAND` command. When entering an operator
-of the corresponding command, the actions defined in `ACTION` will be executed.
+The `ACTION` tag specifies the action to be performed. Typical tag usage -
+inside the `COMMAND` tag. When operator enters the corresponding command, the
+actions defined in `ACTION` will be executed.
 
 The basic attribute of `ACTION` is `sym`. An action can only be performed by
 symbols (functions) defined in plugins. The `sym` attribute refers to such a
 symbol.
 
-Actions can be performed by more than just a command. The following is a list of tags,
-within which `ACTION` may occur:
+Actions can be performed by more than just a command. The following is a list of
+tags, within which `ACTION` may occur:
 
-* `ENTRY` - what `ACTION` will be used for is determined by the `ENTRY` parameters.
-* `COMMAND` - the action defined in `ACTION` is performed when an operator is entered
-of the appropriate command.
+* `ENTRY` - what `ACTION` will be used for is determined by the `ENTRY`
+parameters.
+* `COMMAND` - the action defined in `ACTION` is performed when an operator enters
+the appropriate command.
 * `PARAM` - same as for `COMMAND`.
-* `PTYPE` - `ACTION` defines actions to check the value of the entered
-by the operator of the parameter having the corresponding type.
+* `PTYPE` - `ACTION` defines actions to verify the value of the entered
+parameter.
 
-There can be several elements within the listed elements at the same time
-`ACTION`. Let's call it an `ACTION` element block. Actions are performed
-sequentially, one after the other, unless otherwise defined by the `exec_on` attribute.
+There can be several `ACTION` tags within a single command. Actions are performed
+sequentially, one after the other, unless otherwise defined by the `exec_on`
+attribute.
 
-Multiple action blocks can be defined within a single command. These are
-is possible if the command has parameter branching or optional parameters.
-A block is defined as actions defined within a single element. Actions,
-defined in different elements, including nested elements, belong to different blocks.
-Only one block of actions is always performed.
+Multiple action blocks can be defined within a single command. It's possible if
+the command has parameter branching or optional parameters. A block is an ACTION
+set defined within a single element. Actions, defined in different elements,
+including nested elements, belong to different blocks. Only one block of actions
+will be executed.
 
 ```
 <COMMAND name="cmd1">
@@ -833,99 +832,94 @@ Only one block of actions is always performed.
 </COMMAND>
 ```
 
-The example declares the command "cmd1", which has three alternatives (specified can be
-only one of three) optional parameters. The search for actions to be performed goes
-from end to beginning when parsing the entered command line.
+The example declares the command "cmd1", which has three alternative (only one
+must be selected) optional parameters. The search for actions to be performed
+goes from end to the beginning when parsing the entered command line.
 
-So if the operator entered
-command `cmd1`, the parsing engine will recognize the command named "cmd1" and will
-search for `ACTION` directly in this element. An `ACTION` with the character
-{ "sym1".
+So if the operator entered command `cmd1`, the parsing engine will recognize the
+command named "cmd1" and will search for `ACTION` directly in this element. The
+`ACTION` with the symbol "sym1" will be selected.
 
-If the operator entered the `cmd1 opt1` command, the string "opt1" will be recognized,
-as a parameter (aka subcommand) named "opt1". The search starts from the end, so
-`ACTION` with the symbol "sym2" will be found first. As soon as the action block is found,
-no more actions will be searched and "sym1" will not be found.
+If the operator entered the `cmd1 opt1` command, the string "opt1" will be
+recognized as a parameter (aka subcommand) named "opt1". The search starts from
+the end, so `ACTION` with the symbol "sym2" will be found first. As soon as the
+action block is found, no more actions will be searched and "sym1" will not be
+found.
 
-If the operator entered the `cmd1 opt2` command, the action with the symbol will be found
-"sym1", since the "opt2" element has no nested actions of its own and the search
-goes upstairs to the parent elements.
+If the operator entered the `cmd1 opt2` command, the action with the symbol
+"sym1" will be selected, since the "opt2" element has no nested actions of its
+own and the search goes up to the parent elements.
 
-If the operator entered the `cmd1 arbitrary_string` command, an action with the
-with the symbol "sym3".
+If the operator entered the `cmd1 arbitrary_string` command, the action with the
+symbol "sym3" will be selected.
 
 
 #### Attribute `sym`
 
-The attribute refers to a symbol (function) from the plugin. This function will be executed when
-`ACTION` execution. The value can be a character name, e.g.
-`sym="my_sym"`. In this case, the search for the symbol will be performed over all the
-loaded plug-ins. If you specify a plugin in which you want to search for a symbol, e.g.
-`sym="my_sym@my_plugin"`, then other plugins will not be searched.
+The attribute refers to a symbol (function) from the plugin. This function will
+be executed while `ACTION` execution. The value can be a symbol name, e.g.
+`sym="my_sym"`. In this case, the search for the symbol will be performed over
+all the loaded plug-ins. If you specify a plugin in which you want to search for
+a symbol, e.g. `sym="my_sym@my_plugin"`, then other plugins will not be searched.
 
 Different situations may benefit from different approaches, relative to the
 whether to specify a plugin name for the symbol. On the one hand, several plugins
-can contain characters with the same name and for unambiguous identification
-symbol, specifying the plugin will be mandatory. In addition, when specifying a plugin
-the search for a symbol will be a little faster. On the other hand, you could write
-some universal commands that specify characters without belonging to the
-plugin. Then multiple plugins can implement an "interface", i.e. all the
-the symbols used, and their actual content will depend on which
-plug-in loaded.
+can contain symbols with the same name and for unambiguous identification the
+plugin specifying will be mandatory. In addition, when specifying a plugin
+the search for a symbol will be a little faster. On the other hand, you could
+write some universal commands that specify characters without belonging to the
+plugin. Then multiple plugins can implement an "interface" symbols, and their
+actual content will depend on which plugin is loaded.
 
 
 #### Attribute `lock`
 
 > Attention: the attribute has not yet been implemented
 
-Some actions require atomicity and exclusive access to the resource. When
-This is not automatically ensured when working in klish. Two operators can
-independently, but run the same command at the same time. For
-ensuring atomicity or/and exclusive access to the resource may
-`lock` locks are used. The locks in klish are named.
-The `lock` attribute specifies the lock with which name the `ACTION` will capture when the
-fulfillment. For example `lock="my_lock"`, where "my_lock" is the name of the lock. Capture
-locks with one name have no effect on locks with another name. Thus
-Thus, not only one global blocking can be realized in the system, but also
-Several separate ones, based, for example, on which resource protects the
-lockdown.
+Some actions require to be atomic and need exclusive access to the resource. This
+is not automatically ensured in klish. Two operators can independently run the
+same command at the same time. The `lock` can be used to solve the problem. The
+locks in klish are named. The `lock` attribute specifies the named lock name that
+will be locked while `ACTION` execution. For example - `lock="my_lock"`, where
+"my_lock" is the name of the lock. Capture the locks with one name have no effect
+on locks with another name. Thus, not only one global lock can be implemented
+in the system, but several ones, based, for example, on which resource lock
+protects.
 
 If the lock is captured by one process, another process, when attempting to
-capture the same blockage, will suspend its execution until the release of the
-lockdowns.
+capture the same lock will suspend its execution until the release of the lock.
 
 
 #### Attribute `in`
 
 The attribute indicates whether the action can accept data via standard input
-(stdin) from the user. Possible values are `true`, `false`, `tty`.
-The default value is `false`.
-A value of `false` means that the action does not accept data through the
-standard input. The value `true` means that the action accepts data through the
-standard input. The value `tty` means that the action accepts data through the
-standard input and, in this case, standard input is terminal.
+(stdin) from the user. Possible values are `true`, `false`, `tty`. The default
+value is `false`. A `false` means that the action does not accept data through
+the standard input. The value `true` means that the action accepts data through
+the standard input. The value `tty` means that the action accepts data through
+the standard input and standard input is a terminal.
 
-When an action is performed, the client is made aware of the status of the standardized
-input and, according to it, waits for input from the user or not.
+When an action is performed, the client is made aware of the status of the
+standard input and, according to it, waits for input from the user or not.
 
 If the command involves sequentially performing several actions at once,
-and at least one action has an attribute with the value `tty`, it is considered that the entire
-command has the `tty` attribute. If there are no actions with the attribute value in the command
-`tty`, then an attribute with the value `true` is looked for. If any action has
-value of the `true` attribute, then the whole command has the `true` attribute. Otherwise
-case, the command has the `false` attribute.
+and at least one action has an attribute with the value `tty`, it is considered
+that the entire command has the `tty` attribute. If there are no actions with
+the `tty` value, then an attribute with the value `true` is looked for. If any
+action has value of the `true` attribute, then the whole command has the `true`
+attribute. Otherwise the command has the `false` attribute.
 
 If the user has sent not just one command but a chain of commands for execution
-(via the `|` sign), then the following logic applies to notify the client,
-whether it is required to receive standard input. If any command in the chain has
-value of the `tty` attribute, then standard input is required. If the first command in
-chain has the `true` attribute, then standard input is required. Otherwise
+(via the `|` pipe), then the following logic applies to notify the client
+whether it is required to receive standard input. If any command in the chain
+has attribute value `tty`, then standard input is required. If the first command
+in chain has the `true` attribute, then standard input is required. Otherwise
 standard input is not required.
 
 When performing the action, the serving server can create a pseudo-terminal and
-provide it to the action as a standard input. Will the standard
-input by a pseudo-terminal or not is determined by whether the standard input on the
-to the client side by the terminal or not. This information is transmitted from the client
+provide it to the action as a standard input. Will the standard input be a
+pseudo-terminal or not is determined by whether the standard input on the
+client side is a terminal or not. This information is transmitted from the client
 to the server in the status word.
 
 

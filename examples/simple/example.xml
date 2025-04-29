@@ -6,46 +6,65 @@
 
 <PLUGIN name="klish"/>
 
-<ENTRY name="COMMAND" purpose="ptype">
-	<ENTRY name="completion" purpose="completion">
-		<ACTION sym="completion_COMMAND"/>
-	</ENTRY>
-	<ENTRY name="help" purpose="help">
-		<ACTION sym="completion_COMMAND"/>
-	</ENTRY>
-	<ACTION sym="COMMAND"/>
-</ENTRY>
+<PLUGIN name="script"/>
 
-<ENTRY name="main" mode="switch" container="true">
 
-<ENTRY name="prompt" purpose="prompt">
+<PTYPE name="COMMAND">
+	<COMPL>
+		<ACTION sym="completion_COMMAND@klish"/>
+	</COMPL>
+	<HELP>
+		<ACTION sym="help_COMMAND@klish"/>
+	</HELP>
+	<ACTION sym="COMMAND@klish"/>
+</PTYPE>
+
+<PTYPE name="STRING">
+	<ACTION sym="STRING@klish"/>
+</PTYPE>
+
+
+<VIEW name="main">
+
+<HOTKEY key="^Z" cmd="exit"/>
+
+<PROMPT name="prompt">
 	<ACTION sym="prompt">%u@%h&gt; </ACTION>
-</ENTRY>
+</PROMPT>
 
-<ENTRY name="exit" help="Exit view">
-	<ENTRY name="COMMAND" purpose="ptype" ref="/COMMAND"/>
+<COMMAND name="exit" help="Exit view">
 	<ACTION sym="nav">pop</ACTION>
 	<ACTION sym="printl">Exiting klish session</ACTION>
-</ENTRY>
+</COMMAND>
 
-<ENTRY name="cmd" help="Clear settings" mode="sequence">
-	<ENTRY name="COMMAND" purpose="ptype" ref="/COMMAND"/>
-	<ENTRY name="first" help="Clear settings">
-		<ENTRY name="COMMAND" purpose="ptype" ref="/COMMAND"/>
-		</ENTRY>
+<COMMAND name="cmd" help="Clear settings">
+	<COMMAND name="first" help="Clear settings"/>
 	<ACTION sym="printl">test</ACTION>
-</ENTRY>
+</COMMAND>
 
-<ENTRY name="cmd2" help="Clear settings" mode="sequence">
-	<ENTRY name="COMMAND" purpose="ptype" ref="/COMMAND"/>
+<COMMAND name="cmd2" help="Clear settings">
 	<ACTION sym="printl">test cmd2</ACTION>
-</ENTRY>
+</COMMAND>
 
-<ENTRY name="comm" value="command" help="Clear settings" mode="sequence">
-	<ENTRY name="COMMAND" purpose="ptype" ref="/COMMAND"/>
+<COMMAND name="comm" value="command" help="Clear settings">
 	<ACTION sym="printl">test2</ACTION>
-</ENTRY>
+</COMMAND>
 
-</ENTRY>
+<COMMAND name="ls" help="List path">
+	<PARAM name="path" ptype="/STRING" help="Path"/>
+	<ACTION sym="script">
+	echo "$KLISH_COMMAND"
+	ls "$KLISH_PARAM_path"
+	</ACTION>
+</COMMAND>
+
+<COMMAND name="pytest" help="Test for Python script">
+	<ACTION sym="script">#!/usr/bin/python3
+import os
+print('ENV', os.getenv("KLISH_COMMAND"))
+	</ACTION>
+</COMMAND>
+
+</VIEW>
 
 </KLISH>

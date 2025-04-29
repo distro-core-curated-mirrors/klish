@@ -9,16 +9,6 @@
 <PLUGIN name="script"/>
 
 
-<PTYPE name="COMMAND">
-	<COMPL>
-		<ACTION sym="completion_COMMAND@klish"/>
-	</COMPL>
-	<HELP>
-		<ACTION sym="help_COMMAND@klish"/>
-	</HELP>
-	<ACTION sym="COMMAND@klish"/>
-</PTYPE>
-
 <PTYPE name="STRING">
 	<ACTION sym="STRING@klish"/>
 </PTYPE>
@@ -40,10 +30,6 @@
 <COMMAND name="cmd" help="Clear settings">
 	<COMMAND name="first" help="Clear settings"/>
 	<ACTION sym="printl">test</ACTION>
-</COMMAND>
-
-<COMMAND name="cmd2" help="Clear settings">
-	<ACTION sym="printl">test cmd2</ACTION>
 </COMMAND>
 
 <COMMAND name="comm" value="command" help="Clear settings">

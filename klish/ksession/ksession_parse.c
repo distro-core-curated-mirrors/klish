@@ -322,6 +322,7 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 	klevel_t *level = NULL;
 	size_t level_found = 0; // Level where command was found
 	kpath_t *path = NULL;
+	bool_t dont_parse_upper;
 
 	assert(session);
 	if (!session)
@@ -331,6 +332,9 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 		return NULL;
 
 	argv_iter = faux_argv_iter(argv);
+
+	dont_parse_upper = faux_argv_len(argv) == 0 &&
+		(purpose == KPURPOSE_COMPLETION || purpose == KPURPOSE_HELP);
 
 	// Initialize kpargv_t
 	pargv = kpargv_new();
@@ -359,6 +363,11 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 		// len == 0 and engine will search for completions on higher
 		// levels of path.
 		if (kpargv_pargs_len(pargv) > 0)
+			break;
+		// When the purpose is completion or help and user didn't type
+		// any text yet then don't show completion/help for the upper
+		// kpath levels but only for the current one.
+		if (dont_parse_upper)
 			break;
 		level_found--;
 	}

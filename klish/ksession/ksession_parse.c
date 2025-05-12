@@ -333,8 +333,15 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 
 	argv_iter = faux_argv_iter(argv);
 
-	dont_parse_upper = faux_argv_len(argv) == 0 &&
-		(purpose == KPURPOSE_COMPLETION || purpose == KPURPOSE_HELP);
+	// When the purpose is completion or help and user didn't type
+	// any text yet then don't show completion/help for the upper
+	// kpath levels but only for the current one.
+	// When user enters only single unfinished word then don't show help
+	// for the upper kpath levels too.
+	dont_parse_upper = (faux_argv_len(argv) == 0 &&
+		(purpose == KPURPOSE_COMPLETION || purpose == KPURPOSE_HELP)) ||
+		(faux_argv_len(argv) == 1 && faux_argv_is_continuable(argv) &&
+		purpose == KPURPOSE_HELP);
 
 	// Initialize kpargv_t
 	pargv = kpargv_new();
@@ -364,9 +371,6 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 		// levels of path.
 		if (kpargv_pargs_len(pargv) > 0)
 			break;
-		// When the purpose is completion or help and user didn't type
-		// any text yet then don't show completion/help for the upper
-		// kpath levels but only for the current one.
 		if (dont_parse_upper)
 			break;
 		level_found--;
@@ -538,8 +542,8 @@ static bool_t ksession_check_line(const kpargv_t *pargv, faux_error_t *error,
 // component must be parsed for completion.
 // Completion is a "back-end" operation so it doesn't need detailed error
 // reporting.
-kpargv_t *ksession_parse_for_completion(ksession_t *session,
-	const char *raw_line)
+kpargv_t *ksession_parse_for_hint(ksession_t *session,
+	const char *raw_line, kpargv_purpose_e purpose)
 {
 	faux_list_t *split = NULL;
 	faux_list_node_t *iter = NULL;
@@ -566,9 +570,9 @@ kpargv_t *ksession_parse_for_completion(ksession_t *session,
 		faux_argv_t *argv = (faux_argv_t *)faux_list_data(iter);
 		bool_t is_last = (iter == faux_list_tail(split));
 		bool_t is_first = (iter == faux_list_head(split));
-		kpargv_purpose_e purpose = is_last ? KPURPOSE_COMPLETION : KPURPOSE_EXEC;
+		kpargv_purpose_e purp = is_last ? purpose : KPURPOSE_EXEC;
 
-		pargv = ksession_parse_line(session, argv, purpose, !is_first);
+		pargv = ksession_parse_line(session, argv, purp, !is_first);
 		if (!ksession_check_line(pargv, NULL, is_first, is_piped)) {
 			kpargv_free(pargv);
 			pargv = NULL;

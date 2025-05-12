@@ -646,7 +646,8 @@ static bool_t ktpd_session_process_completion(ktpd_session_t *ktpd, faux_msg_t *
 	}
 
 	// Parsing
-	pargv = ksession_parse_for_completion(ktpd->session, line);
+	pargv = ksession_parse_for_hint(ktpd->session, line,
+		KPURPOSE_COMPLETION);
 	faux_str_free(line);
 	if (!pargv) {
 		ktp_send_error(ktpd->async, cmd, NULL);
@@ -794,7 +795,7 @@ static bool_t ktpd_session_process_help(ktpd_session_t *ktpd, faux_msg_t *msg)
 	}
 
 	// Parsing
-	pargv = ksession_parse_for_completion(ktpd->session, line);
+	pargv = ksession_parse_for_hint(ktpd->session, line, KPURPOSE_HELP);
 	faux_str_free(line);
 	if (!pargv) {
 		ktp_send_error(ktpd->async, cmd, NULL);

@@ -2112,7 +2112,51 @@ If the `/tmp/cond_file` file exists, the "cmd1" command is available to the oper
 if it does not exist, the command is hidden.
 
 
-## klish plugin ##
+### LOG
+
+The `LOG` element defines way and scope to log client commands. The
+[`ACTION`](#action) resides inside `LOG` and specifies the logging code. These
+actions will be executed after client command finishing. The client command
+return code is available for the logging code.
+
+The `LOG` element can be specified inside the following elements:
+[`KLISH`](#klish) (global space), [`VIEW`](#view), [`COMMAND`](#command). The
+engine will use the closest `LOG` element for the logging. It means if `LOG` is
+defined inside `COMMAND` tag then this element will be selected for logging. If
+`COMMAND` has no nested `LOG` element then engine will search for `LOG` up
+through the hierarchy. I.e. it will search in `VIEW` (which the command is
+defined in) and then in global space.
+
+The `LOG` element is not mandatory. The one hierarchy level can't contain more
+than one `LOG` element.
+
+The flexibility and positioning of `LOG` elements allow to log different
+commands or command groups using different mechanisms.
+
+
+#### Examples
+
+```
+<LOG>
+  <ACTION sym="syslog"/>
+</LOG>
+
+<VIEW name="main">
+
+  <COMMAND name="cmd1" help="Command 1">
+    <ACTION sym="script">
+    ls
+    </ACTION>
+  </COMMAND>
+
+</VIEW>
+```
+
+The fact of "cmd1" command execution will be logged to the syslog. The `syslog`
+symbol is defined inside standard "klish" plugin.
+
+
+## The "klish" plugin
 
 The klish source tree includes the code for the standard "klish" plugin.
 The plugin contains basic data types, navigation command and other auxiliary data types

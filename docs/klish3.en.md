@@ -890,6 +890,16 @@ If the lock is captured by one process, another process, when attempting to
 capture the same lock will suspend its execution until the release of the lock.
 
 
+#### Attribute `interrupt`
+
+The boolean flag specifies whether action could be interrupted by `Ctrl^C`.
+Possible values are `true`, `false`. Default is `false`.
+
+The atomic actions must be non-interruptible. It's recommended to set
+interruptible attribute to `true` value for the long-time informational
+commands. 
+
+
 #### Attribute `in`
 
 The attribute indicates whether the action can accept data via standard input

@@ -153,7 +153,7 @@
 * [lock="<name>"] - Named lock. It will use special lockfile while
 *	action execution.
 *
-* [interrupt="true/false"] - The boolean field that specify that action can be
+* [interrupt="true/false"] - The boolean field specifies whether action could
 *	be interrupted by Ctrl^C. Default is false.
 *
 * [in="true/false/tty"] - Does ACTION need input. The "tty" means action can use

@@ -94,7 +94,7 @@ bool_t kcontext_done(const kcontext_t *context);
 FAUX_HIDDEN bool_t kcontext_set_done(kcontext_t *context, bool_t done);
 
 // Line
-const char *kcontext_line(const kcontext_t *exec);
+const char *kcontext_line(const kcontext_t *context);
 bool_t kcontext_set_line(kcontext_t *exec, const char *line);
 
 // Pipeline stage

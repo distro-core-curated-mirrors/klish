@@ -48,14 +48,27 @@ const char *kcontext_type_e_str[] = {
 #define OVERWRITE 1
 
 
-static bool_t populate_env_kpargv(const kpargv_t *pargv, const char *prefix)
+static bool_t populate_env_kpargv(const kcontext_t *context, const char *prefix)
 {
+	const char *line = NULL;
+	const kpargv_t *pargv = NULL;
 	const kentry_t *cmd = NULL;
 	faux_list_node_t *iter = NULL;
 	faux_list_node_t *cur = NULL;
 
+	if (!context)
+		return BOOL_FALSE;
+	pargv = kcontext_pargv(context);
 	if (!pargv)
 		return BOOL_FALSE;
+
+	// Line
+	line = kcontext_line(context);
+	if (line) {
+		char *var = faux_str_sprintf("%sLINE", prefix);
+		setenv(var, line, OVERWRITE);
+		faux_str_free(var);
+	}
 
 	// Command
 	cmd = kpargv_command(pargv);
@@ -113,7 +126,7 @@ static bool_t populate_env_kpargv(const kpargv_t *pargv, const char *prefix)
 }
 
 
-static bool_t populate_env(kcontext_t *context)
+static bool_t populate_env(const kcontext_t *context)
 {
 	kcontext_type_e type = KCONTEXT_TYPE_NONE;
 	const kentry_t *entry = NULL;
@@ -164,10 +177,10 @@ static bool_t populate_env(kcontext_t *context)
 		setenv(PREFIX"USER", str, OVERWRITE);
 
 	// Parameters
-	populate_env_kpargv(kcontext_pargv(context), PREFIX);
+	populate_env_kpargv(context, PREFIX);
 
 	// Parent parameters
-	populate_env_kpargv(kcontext_parent_pargv(context), PREFIX"PARENT_");
+	populate_env_kpargv(kcontext_parent_context(context), PREFIX"PARENT_");
 
 	return BOOL_TRUE;
 }

@@ -88,6 +88,8 @@ static bool_t populate_env_kpargv(const kcontext_t *context, const char *prefix)
 		faux_list_node_t *iter_after = cur;
 		unsigned int num = 0;
 		bool_t already_populated = BOOL_FALSE;
+		char *whole_param = NULL;
+		char *whole_param_var = NULL;
 
 		if (!kparg_value(parg)) // PTYPE can contain parg with NULL value
 			continue;
@@ -106,20 +108,30 @@ static bool_t populate_env_kpargv(const kcontext_t *context, const char *prefix)
 		while ((tmp_parg = (kparg_t *)faux_list_each(&iter_after))) {
 			char *var = NULL;
 			const char *value = kparg_value(tmp_parg);
+			char *qvalue = faux_str_c_esc_quote(value);
+
 			if (kparg_entry(tmp_parg) != entry)
 				continue;
-			if (num == 0) {
-				var = faux_str_sprintf("%sPARAM_%s",
-					prefix, kentry_name(entry));
-				setenv(var, value, OVERWRITE);
-				faux_str_free(var);
-			}
+
 			var = faux_str_sprintf("%sPARAM_%s_%u",
 				prefix, kentry_name(entry), num);
 			setenv(var, value, OVERWRITE);
 			faux_str_free(var);
+
+			whole_param = faux_str_sprintf("%s%s%s",
+				whole_param ? whole_param : "",
+				whole_param ? " " : "", qvalue);
+			faux_str_free(qvalue);
+
 			num++;
 		}
+
+		// All values of PARAM in one line (for multi-value parameters)
+		whole_param_var = faux_str_sprintf("%sPARAM_%s",
+			prefix, kentry_name(entry));
+		setenv(whole_param_var, whole_param, OVERWRITE);
+		faux_str_free(whole_param_var);
+		faux_str_free(whole_param);
 	}
 
 	return BOOL_TRUE;

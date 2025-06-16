@@ -340,7 +340,7 @@ Parameter header:
 |-----------|--------------------------------------|
 |2          |Parameter type                        |
 |2          |Reserved                              |
-|1          |Parameter data length (without header)|
+|4          |Parameter data length (without header)|
 
 Parameter types:
 

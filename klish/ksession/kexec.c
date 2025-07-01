@@ -716,11 +716,19 @@ static bool_t exec_action_sequence(const kexec_t *exec, kcontext_t *context,
 		// Is it end of ACTION sequence?
 		if (!iter) {
 			kcontext_set_done(context, BOOL_TRUE);
+
 			// Close the stdout of finished ACTION sequence to inform
 			// process next in pipe about EOF. Else filter will not
 			// stop at all.
 			close(kcontext_stdout(context));
 			kcontext_set_stdout(context, -1);
+
+			// Close the stdin of finished ACTION sequence to inform
+			// process previous in pipe. Else previous command will
+			// try to write to the pipe continously.
+			close(kcontext_stdin(context));
+			kcontext_set_stdin(context, -1);
+
 			return BOOL_TRUE;
 		}
 

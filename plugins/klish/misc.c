@@ -118,6 +118,16 @@ int klish_prompt(kcontext_t *context)
 				faux_str_cat(&prompt, "%");
 				break;
 				}
+			// Backslash symbol itself
+			case '\\': {
+				faux_str_cat(&prompt, "\\");
+				break;
+				}
+			// Escape character
+			case 'e': {
+				faux_str_cat(&prompt, "\x1b");
+				break;
+				}
 			// Hostname
 			case 'h': {
 				struct utsname buf;
@@ -136,7 +146,8 @@ int klish_prompt(kcontext_t *context)
 			}
 			is_macro = BOOL_FALSE;
 			start = pos + 1;
-		} else if (*pos == '%') {
+
+		} else if (*pos == '%' || *pos == '\\') {
 			is_macro = BOOL_TRUE;
 			if (pos > start)
 				faux_str_catn(&prompt, start, pos - start);

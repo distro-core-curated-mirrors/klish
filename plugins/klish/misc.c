@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 
+#include <faux/conv.h>
 #include <faux/str.h>
 #include <faux/list.h>
 #include <faux/sysdb.h>
@@ -126,6 +127,24 @@ int klish_prompt(kcontext_t *context)
 			// Escape character
 			case 'e': {
 				faux_str_cat(&prompt, "\x1b");
+				break;
+				}
+			// Hexadecimal byte
+			case 'x': {
+				char c;
+				char hs[3] = {};
+				if (*(pos + 1) == '\0')
+					break;
+				if (*(pos + 2) == '\0') {
+					pos++;
+					break;
+				}
+				hs[0] = *(pos + 1);
+				hs[1] = *(pos + 2);
+				pos += 2;
+				if (!faux_conv_atouc(hs, &c, 16))
+					break;
+				faux_str_catn(&prompt, &c, 1);
 				break;
 				}
 			// Hostname

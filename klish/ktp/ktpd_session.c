@@ -69,7 +69,7 @@ static bool_t get_stream(ktpd_session_t *ktpd, kexec_t *exec, int fd, bool_t is_
 
 
 ktpd_session_t *ktpd_session_new(int sock, kscheme_t *scheme,
-	const char *start_entry, faux_eloop_t *eloop)
+	const char *starting_entry, faux_eloop_t *eloop)
 {
 	ktpd_session_t *ktpd = NULL;
 
@@ -86,8 +86,9 @@ ktpd_session_t *ktpd_session_new(int sock, kscheme_t *scheme,
 	// Init
 	ktpd->state = KTPD_SESSION_STATE_UNAUTHORIZED;
 	ktpd->eloop = eloop;
-	ktpd->session = ksession_new(scheme, start_entry);
+	ktpd->session = ksession_new(scheme, starting_entry);
 	if (!ktpd->session) {
+		syslog(LOG_ERR, "Probably the scheme is illegal or not defined");
 		faux_free(ktpd);
 		return NULL;
 	}

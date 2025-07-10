@@ -13,6 +13,9 @@
 #include <klish/kudata.h>
 
 
+#define KSCHEME_DEFAULT_STARTING_ENTRY "main"
+
+
 typedef struct kscheme_s kscheme_t;
 
 typedef faux_list_node_t kscheme_plugins_node_t;
@@ -47,6 +50,8 @@ kentry_t *kscheme_find_entry(const kscheme_t *scheme, const char *name);
 ssize_t kscheme_entrys_len(const kscheme_t *scheme);
 kscheme_entrys_node_t *kscheme_entrys_iter(const kscheme_t *scheme);
 kentry_t *kscheme_entrys_each(kscheme_entrys_node_t **iter);
+kentry_t *kscheme_starting_entry(const kscheme_t *scheme,
+	const char *starting_entry);
 
 // User data store
 bool_t kscheme_named_udata_new(kscheme_t *scheme,

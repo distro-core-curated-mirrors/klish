@@ -72,11 +72,10 @@ KGET_BOOL(session, isatty_stderr);
 KSET_BOOL(session, isatty_stderr);
 
 
-ksession_t *ksession_new(kscheme_t *scheme, const char *start_entry)
+ksession_t *ksession_new(kscheme_t *scheme, const char *starting_entry)
 {
 	ksession_t *session = NULL;
 	const kentry_t *entry = NULL;
-	const char *entry_to_search = NULL;
 	klevel_t *level = NULL;
 
 	assert(scheme);
@@ -84,16 +83,8 @@ ksession_t *ksession_new(kscheme_t *scheme, const char *start_entry)
 		return NULL;
 
 	// Before real session allocation we will try to find starting entry.
-	// Starting entry can be get from function argument, from STARTUP tag or
-	// default name 'main' can be used. Don't create session if we can't get
-	// starting entry at all. Priorities are (from higher) argument, STARTUP,
-	// default name.
-	if (start_entry)
-		entry_to_search = start_entry;
-	// STARTUP is not implemented yet
-	else
-		entry_to_search = KSESSION_STARTING_ENTRY;
-	entry = kscheme_find_entry_by_path(scheme, entry_to_search);
+	// Don't create session if we can't get starting entry.
+	entry = kscheme_starting_entry(scheme, starting_entry);
 	if (!entry)
 		return NULL; // Can't find starting entry
 

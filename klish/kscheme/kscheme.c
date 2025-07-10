@@ -87,6 +87,29 @@ void kscheme_free(kscheme_t *scheme)
 	faux_free(scheme);
 }
 
+
+kentry_t *kscheme_starting_entry(const kscheme_t *scheme,
+	const char *starting_entry)
+{
+	const char *entry_to_search = NULL;
+
+	assert(scheme);
+	if (!scheme)
+		return NULL;
+
+	// Starting entry can be get from the function argument, from the STARTUP
+	// tag or default name "main" can be used. Priorities are (from higher):
+	// argument, STARTUP, default name.
+	if (starting_entry)
+		entry_to_search = starting_entry;
+	// STARTUP is not implemented yet
+	else
+		entry_to_search = KSCHEME_DEFAULT_STARTING_ENTRY;
+
+	return kscheme_find_entry_by_path(scheme, entry_to_search);
+}
+
+
 #define TAG "PLUGIN"
 
 static bool_t kscheme_load_plugins(kscheme_t *scheme, kcontext_t *context,

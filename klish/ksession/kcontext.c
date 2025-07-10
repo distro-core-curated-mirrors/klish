@@ -337,16 +337,19 @@ kplugin_t *kcontext_plugin(const kcontext_t *context)
 }
 
 
-static int kcontext_vprintf(const kcontext_t *context,
-	bool_t is_stderr, const char *fmt, va_list ap)
+ssize_t kcontext_fwrite(const kcontext_t *context, FILE *stream,
+	const char *line, size_t len)
 {
 	const kaction_t *action = NULL;
 	const ksym_t *sym = NULL;
 	faux_buf_t *buf = NULL;
 	int rc = -1;
-	FILE *f = NULL;
 
+	if (len < 1)
+		return 0;
 	if (!context)
+		return -1;
+	if (stream != stdout && stream != stderr)
 		return -1;
 	action = kcontext_action(context);
 	if (!action)
@@ -355,29 +358,48 @@ static int kcontext_vprintf(const kcontext_t *context,
 	if (!sym)
 		return -1;
 
-	if (is_stderr) {
-		buf = kcontext_buferr(context);
-		f = stderr;
-	} else {
-		buf = kcontext_bufout(context);
-		f = stdout;
+	// "Silent" output
+	if (ksym_sync(sym) && ksym_silent(sym) &&
+		kcontext_is_last_pipeline_stage(context))
+	{
+		buf = (stream == stderr) ? kcontext_buferr(context) :
+			kcontext_bufout(context);
+		if (!buf)
+			return -1;
+		faux_buf_write(buf, line, len);
+		return len;
 	}
 
-	// "Silent" output
-	if (ksym_sync(sym) &&
-		ksym_silent(sym) &&
-		kcontext_is_last_pipeline_stage(context) &&
-		buf) {
-		char *line = NULL;
-		line = faux_str_vsprintf(fmt, ap);
-		rc = strlen(line);
-		if (rc > 0)
-			faux_buf_write(buf, line, rc);
-		faux_str_free(line);
-	} else {
-		rc = vfprintf(f, fmt, ap);
-		fflush(f);
-	}
+	rc = fwrite(line, 1, len, stream);
+	fflush(stream);
+
+	return rc;
+}
+
+
+static int kcontext_vprintf(const kcontext_t *context,
+	FILE *stream, const char *fmt, va_list ap)
+{
+	int rc = -1;
+	char *line = NULL;
+
+	line = faux_str_vsprintf(fmt, ap);
+	rc = kcontext_fwrite(context, stream, line, strlen(line));
+	faux_str_free(line);
+
+	return rc;
+}
+
+
+int kcontext_fprintf(const kcontext_t *context, FILE *stream,
+	const char *fmt, ...)
+{
+	int rc = -1;
+	va_list ap;
+
+	va_start(ap, fmt);
+	rc = kcontext_vprintf(context, stream, fmt, ap);
+	va_end(ap);
 
 	return rc;
 }
@@ -389,20 +411,7 @@ int kcontext_printf(const kcontext_t *context, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	rc = kcontext_vprintf(context, BOOL_FALSE, fmt, ap);
-	va_end(ap);
-
-	return rc;
-}
-
-
-int kcontext_printf_err(const kcontext_t *context, const char *fmt, ...)
-{
-	int rc = -1;
-	va_list ap;
-
-	va_start(ap, fmt);
-	rc = kcontext_vprintf(context, BOOL_TRUE, fmt, ap);
+	rc = kcontext_vprintf(context, stdout, fmt, ap);
 	va_end(ap);
 
 	return rc;

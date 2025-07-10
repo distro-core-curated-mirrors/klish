@@ -167,3 +167,22 @@ int klish_nav(kcontext_t *context)
 
 	return 0;
 }
+
+
+// Symbol to show current path
+int klish_pwd(kcontext_t *context)
+{
+	kpath_t *path = NULL;
+	kpath_levels_node_t *iter = NULL;
+	klevel_t *level = NULL;
+
+	path = ksession_path(kcontext_session(context));
+	iter = kpath_iter(path);
+	while ((level = kpath_each(&iter))) {
+		kcontext_printf(context, "/%s",
+			kentry_name(klevel_entry(level)));
+	}
+	kcontext_printf(context, "\n");
+
+	return 0;
+}

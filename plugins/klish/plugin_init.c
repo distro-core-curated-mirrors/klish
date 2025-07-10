@@ -28,11 +28,12 @@ int kplugin_klish_init(kcontext_t *context)
 	// Misc
 	kplugin_add_syms(plugin, ksym_new_ext("nop", klish_nop,
 		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
-	kplugin_add_syms(plugin, ksym_new("tsym", klish_tsym));
-	kplugin_add_syms(plugin, ksym_new("print", klish_print));
-	kplugin_add_syms(plugin, ksym_new("printl", klish_printl));
-	kplugin_add_syms(plugin, ksym_new_ext("pwd", klish_pwd,
-		KSYM_PERMANENT, KSYM_SYNC, KSYM_NONSILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("tsym", klish_tsym,
+		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("print", klish_print,
+		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("printl", klish_printl,
+		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
 	kplugin_add_syms(plugin, ksym_new_ext("prompt", klish_prompt,
 		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
 
@@ -45,16 +46,20 @@ int kplugin_klish_init(kcontext_t *context)
 	// actions will be fork()-ed so it can't change current path.
 	kplugin_add_syms(plugin, ksym_new_ext("nav", klish_nav,
 		KSYM_PERMANENT, KSYM_SYNC, KSYM_SILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("pwd", klish_pwd,
+		KSYM_PERMANENT, KSYM_SYNC, KSYM_SILENT));
 
 	// PTYPEs
 	// These PTYPEs are simple and fast so set SYNC flag
 	kplugin_add_syms(plugin, ksym_new_ext("COMMAND", klish_ptype_COMMAND,
 		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
-	kplugin_add_syms(plugin, ksym_new_ext("completion_COMMAND", klish_completion_COMMAND,
-		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_NONSILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("completion_COMMAND",
+		klish_completion_COMMAND,
+		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
 	kplugin_add_syms(plugin, ksym_new_ext("help_COMMAND", klish_help_COMMAND,
-		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_NONSILENT));
-	kplugin_add_syms(plugin, ksym_new_ext("COMMAND_CASE", klish_ptype_COMMAND_CASE,
+		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
+	kplugin_add_syms(plugin, ksym_new_ext("COMMAND_CASE",
+		klish_ptype_COMMAND_CASE,
 		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));
 	kplugin_add_syms(plugin, ksym_new_ext("INT", klish_ptype_INT,
 		KSYM_USERDEFINED_PERMANENT, KSYM_SYNC, KSYM_SILENT));

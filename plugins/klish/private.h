@@ -16,7 +16,6 @@ int klish_nop(kcontext_t *context);
 int klish_tsym(kcontext_t *context);
 int klish_print(kcontext_t *context);
 int klish_printl(kcontext_t *context);
-int klish_pwd(kcontext_t *context);
 int klish_prompt(kcontext_t *context);
 
 // Log
@@ -24,6 +23,7 @@ int klish_syslog(kcontext_t *context);
 
 // Navigation
 int klish_nav(kcontext_t *context);
+int klish_pwd(kcontext_t *context);
 
 // PTYPEs
 int klish_ptype_COMMAND(kcontext_t *context);

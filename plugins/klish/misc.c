@@ -35,12 +35,12 @@ int klish_tsym(kcontext_t *context)
 
 	script = kcontext_script(context);
 	if (faux_str_is_empty(script)) {
-		printf("[<empty>]\n");
-		fprintf(stderr, "Empty item\n");
+		kcontext_printf(context, "[<empty>]\n");
+		kcontext_fprintf(context, stderr, "Empty item\n");
 		return -1;
 	}
 
-	printf("[%s]\n", script);
+	kcontext_printf(context, "[%s]\n", script);
 
 	return 0;
 }
@@ -55,7 +55,7 @@ int klish_printl(kcontext_t *context)
 	if (faux_str_is_empty(script))
 		script = "";
 
-	printf("%s\n", script);
+	kcontext_printf(context, "%s\n", script);
 
 	return 0;
 }
@@ -70,26 +70,7 @@ int klish_print(kcontext_t *context)
 	if (faux_str_is_empty(script))
 		script = "";
 
-	printf("%s", script);
-	fflush(stdout);
-
-	return 0;
-}
-
-
-// Symbol to show current path
-int klish_pwd(kcontext_t *context)
-{
-	kpath_t *path = NULL;
-	kpath_levels_node_t *iter = NULL;
-	klevel_t *level = NULL;
-
-	path = ksession_path(kcontext_session(context));
-	iter = kpath_iter(path);
-	while ((level = kpath_each(&iter))) {
-		printf("/%s", kentry_name(klevel_entry(level)));
-	}
-	printf("\n");
+	kcontext_printf(context, "%s", script);
 
 	return 0;
 }
@@ -176,7 +157,7 @@ int klish_prompt(kcontext_t *context)
 	if (pos > start)
 		faux_str_catn(&prompt, start, pos - start);
 
-	kcontext_printf(context, "%s", prompt);
+	kcontext_fwrite(context, stdout, prompt, strlen(prompt));
 	faux_str_free(prompt);
 
 	return 0;

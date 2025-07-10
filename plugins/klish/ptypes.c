@@ -61,7 +61,7 @@ int klish_completion_COMMAND(kcontext_t *context)
 	if (!command_name)
 		return 0;
 
-	printf("%s\n", command_name);
+	kcontext_printf(context, "%s\n", command_name);
 
 	return 0;
 }
@@ -97,7 +97,7 @@ int klish_help_COMMAND(kcontext_t *context)
 		help_text = kentry_name(entry);
 	assert(help_text);
 
-	printf("%s\n%s\n", command_name, help_text);
+	kcontext_printf(context, "%s\n%s\n", command_name, help_text);
 
 	return 0;
 }

@@ -108,7 +108,7 @@ static bool_t populate_env_kpargv(const kcontext_t *context, const char *prefix)
 		while ((tmp_parg = (kparg_t *)faux_list_each(&iter_after))) {
 			char *var = NULL;
 			const char *value = kparg_value(tmp_parg);
-			char *qvalue = faux_str_c_esc_quote(value);
+			char *qvalue = NULL;
 
 			if (kparg_entry(tmp_parg) != entry)
 				continue;
@@ -118,6 +118,7 @@ static bool_t populate_env_kpargv(const kcontext_t *context, const char *prefix)
 			setenv(var, value, OVERWRITE);
 			faux_str_free(var);
 
+			qvalue = faux_str_c_esc_quote(value);
 			whole_param = faux_str_sprintf("%s%s%s",
 				whole_param ? whole_param : "",
 				whole_param ? " " : "", qvalue);

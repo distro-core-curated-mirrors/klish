@@ -31,10 +31,27 @@ typedef int (*ksym_fn)(kcontext_t *context);
 C_DECL_BEGIN
 
 // ksym_t
-ksym_t *ksym_new(const char *name, ksym_fn function);
 ksym_t *ksym_new_ext(const char *name, ksym_fn function,
 	tri_t permanent, tri_t sync, bool_t silent);
 void ksym_free(ksym_t *sym);
+
+
+// Typical sym definition for external plugins.
+static inline ksym_t *ksym_new(const char *name, ksym_fn function)
+{
+	return ksym_new_ext(name, function, KSYM_USERDEFINED_PERMANENT,
+		KSYM_USERDEFINED_SYNC, KSYM_NONSILENT);
+}
+
+
+// Typical definition for internal syms like PTYPE checkers, simple completion
+// and help functions that can write to text buffer but not to stdout.
+static inline ksym_t *ksym_new_fast(const char *name, ksym_fn function)
+{
+	return ksym_new_ext(name, function, KSYM_USERDEFINED_PERMANENT,
+		KSYM_SYNC, KSYM_SILENT);
+}
+
 
 const char *ksym_name(const ksym_t *sym);
 

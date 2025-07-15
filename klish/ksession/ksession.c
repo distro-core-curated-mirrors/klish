@@ -75,7 +75,7 @@ KSET_BOOL(session, isatty_stderr);
 ksession_t *ksession_new(kscheme_t *scheme, const char *starting_entry)
 {
 	ksession_t *session = NULL;
-	const kentry_t *entry = NULL;
+	kentry_t *entry = NULL;
 	klevel_t *level = NULL;
 
 	assert(scheme);

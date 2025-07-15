@@ -18,7 +18,7 @@ struct kpargv_s {
 	faux_list_t *completions;
 	kpargv_status_e status; // Parse status
 	size_t level; // Number of path's level where command was found
-	const kentry_t *command; // ENTRY that consider as command (has ACTIONs)
+	kentry_t *command; // ENTRY that consider as command (has ACTIONs)
 	bool_t continuable; // Last argument can be expanded
 	kpargv_purpose_e purpose; // Exec/Completion/Help
 	char *last_arg;
@@ -34,8 +34,8 @@ KGET(pargv, size_t, level);
 KSET(pargv, size_t, level);
 
 // Command
-KGET(pargv, const kentry_t *, command);
-KSET(pargv, const kentry_t *, command);
+KGET(pargv, kentry_t *, command);
+KSET(pargv, kentry_t *, command);
 
 // Continuable
 KGET_BOOL(pargv, continuable);
@@ -69,7 +69,7 @@ KADD_NESTED(pargv, const kentry_t *, completions);
 KNESTED_LEN(pargv, completions);
 KNESTED_IS_EMPTY(pargv, completions);
 KNESTED_ITER(pargv, completions);
-KNESTED_EACH(pargv, const kentry_t *, completions);
+KNESTED_EACH(pargv, kentry_t *, completions);
 
 
 static int kpargv_completions_compare(const void *first, const void *second)

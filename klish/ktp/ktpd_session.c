@@ -590,8 +590,8 @@ static bool_t ktpd_session_log(ktpd_session_t *ktpd, const kexec_t *exec)
 
 	iter = kexec_contexts_iter(exec);
 	while ((context = kexec_contexts_each(&iter))) {
-		const kentry_t *entry = kcontext_command(context);
-		const kentry_t *log_entry = NULL;
+		kentry_t *entry = kcontext_command(context);
+		kentry_t *log_entry = NULL;
 		int rc = -1;
 
 		if (!entry)
@@ -673,7 +673,7 @@ static bool_t ktpd_session_process_completion(ktpd_session_t *ktpd, faux_msg_t *
 
 	// Fill msg with possible completions
 	if (!kpargv_completions_is_empty(pargv)) {
-		const kentry_t *candidate = NULL;
+		kentry_t *candidate = NULL;
 		kpargv_completions_node_t *citer = kpargv_completions_iter(pargv);
 		faux_list_node_t *compl_iter = NULL;
 		faux_list_t *completions = NULL;
@@ -683,7 +683,7 @@ static bool_t ktpd_session_process_completion(ktpd_session_t *ktpd, faux_msg_t *
 			compl_compare, compl_kcompare,
 			(void (*)(void *))faux_str_free);
 		while ((candidate = kpargv_completions_each(&citer))) {
-			const kentry_t *completion = NULL;
+			kentry_t *completion = NULL;
 			kparg_t *parg = NULL;
 			int rc = -1;
 			char *out = NULL;
@@ -816,7 +816,7 @@ static bool_t ktpd_session_process_help(ktpd_session_t *ktpd, faux_msg_t *msg)
 
 	// Fill msg with possible help messages
 	if (!kpargv_completions_is_empty(pargv)) {
-		const kentry_t *candidate = NULL;
+		kentry_t *candidate = NULL;
 		kpargv_completions_node_t *citer = kpargv_completions_iter(pargv);
 		faux_list_node_t *help_iter = NULL;
 		faux_list_t *help_list = NULL;
@@ -825,8 +825,8 @@ static bool_t ktpd_session_process_help(ktpd_session_t *ktpd, faux_msg_t *msg)
 		help_list = faux_list_new(FAUX_LIST_SORTED, FAUX_LIST_UNIQUE,
 			help_compare, NULL, help_free);
 		while ((candidate = kpargv_completions_each(&citer))) {
-			const kentry_t *help = NULL;
-			const kentry_t *ptype = NULL;
+			kentry_t *help = NULL;
+			kentry_t *ptype = NULL;
 
 			// Get PTYPE of parameter
 			ptype = kentry_nested_by_purpose(candidate,

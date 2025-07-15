@@ -20,10 +20,10 @@ kpargv_t *ksession_parse_for_hint(ksession_t *session,
 	const char *raw_line, kpargv_purpose_e purpose);
 kexec_t *ksession_parse_for_exec(ksession_t *session, const char *raw_line,
 	faux_error_t *error);
-kexec_t *ksession_parse_for_local_exec(ksession_t *session, const kentry_t *entry,
+kexec_t *ksession_parse_for_local_exec(ksession_t *session, kentry_t *entry,
 	const kpargv_t *parent_pargv, const kcontext_t *parent_context,
 	const kexec_t *parent_exec);
-bool_t ksession_exec_locally(ksession_t *session, const kentry_t *entry,
+bool_t ksession_exec_locally(ksession_t *session, kentry_t *entry,
 	kpargv_t *parent_pargv, const kcontext_t *parent_context,
 	const kexec_t *parent_exec, int *retcode, char **out);
 

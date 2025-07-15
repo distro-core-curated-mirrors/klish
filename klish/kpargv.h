@@ -43,10 +43,10 @@ C_DECL_BEGIN
 
 // Parg
 
-kparg_t *kparg_new(const kentry_t *entry, const char *value);
+kparg_t *kparg_new(kentry_t *entry, const char *value);
 void kparg_free(kparg_t *parg);
 
-const kentry_t *kparg_entry(const kparg_t *parg);
+kentry_t *kparg_entry(const kparg_t *parg);
 bool_t kparg_set_value(kparg_t *parg, const char *value);
 const char *kparg_value(const kparg_t *parg);
 
@@ -64,8 +64,8 @@ const char *kpargv_status_str(const kpargv_t *pargv);
 size_t kpargv_level(const kpargv_t *pargv);
 bool_t kpargv_set_level(kpargv_t *pargv, size_t level);
 // Command
-const kentry_t *kpargv_command(const kpargv_t *pargv);
-bool_t kpargv_set_command(kpargv_t *pargv, const kentry_t *command);
+kentry_t *kpargv_command(const kpargv_t *pargv);
+bool_t kpargv_set_command(kpargv_t *pargv, kentry_t *command);
 // Continuable
 bool_t kpargv_continuable(const kpargv_t *pargv);
 bool_t kpargv_set_continuable(kpargv_t *pargv, bool_t continuable);
@@ -101,7 +101,7 @@ bool_t kpargv_add_completions(kpargv_t *pargv, const kentry_t *completion);
 ssize_t kpargv_completions_len(const kpargv_t *pargv);
 bool_t kpargv_completions_is_empty(const kpargv_t *pargv);
 kpargv_completions_node_t *kpargv_completions_iter(const kpargv_t *pargv);
-const kentry_t *kpargv_completions_each(kpargv_completions_node_t **iter);
+kentry_t *kpargv_completions_each(kpargv_completions_node_t **iter);
 
 // Debug
 bool_t kpargv_debug(const kpargv_t *pargv);

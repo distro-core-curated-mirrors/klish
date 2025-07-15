@@ -11,15 +11,15 @@
 #include <klish/kentry.h>
 
 struct klevel_s {
-	const kentry_t *entry;
+	kentry_t *entry;
 };
 
 
 // ENTRY
-KGET(level, const kentry_t *, entry);
+KGET(level, kentry_t *, entry);
 
 
-klevel_t *klevel_new(const kentry_t *entry)
+klevel_t *klevel_new(kentry_t *entry)
 {
 	klevel_t *level = NULL;
 

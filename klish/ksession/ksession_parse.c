@@ -31,7 +31,7 @@ static bool_t ksession_validate_arg(ksession_t *session, kpargv_t *pargv)
 {
 	char *out = NULL;
 	int retcode = -1;
-	const kentry_t *ptype_entry = NULL;
+	kentry_t *ptype_entry = NULL;
 	kparg_t *candidate = NULL;
 
 	assert(session);
@@ -64,10 +64,10 @@ static bool_t ksession_validate_arg(ksession_t *session, kpargv_t *pargv)
 
 
 static kpargv_status_e ksession_parse_arg(ksession_t *session,
-	const kentry_t *current_entry, faux_argv_node_t **argv_iter,
+	kentry_t *current_entry, faux_argv_node_t **argv_iter,
 	kpargv_t *pargv, bool_t entry_is_command, bool_t is_filter)
 {
-	const kentry_t *entry = current_entry;
+	kentry_t *entry = current_entry;
 	kentry_mode_e mode = KENTRY_MODE_NONE;
 	kpargv_status_e retcode = KPARSE_NONE; // For ENTRY itself
 	kpargv_status_e rc = KPARSE_NONE; // For nested ENTRYs
@@ -184,7 +184,7 @@ static kpargv_status_e ksession_parse_arg(ksession_t *session,
 	// 'min'/'max'.
 	if (KENTRY_MODE_SWITCH == mode) {
 		kentry_entrys_node_t *iter = kentry_entrys_iter(entry);
-		const kentry_t *nested = NULL;
+		kentry_t *nested = NULL;
 
 //if (kentry_purpose(entry) == KENTRY_PURPOSE_COMMON)
 //fprintf(stderr, "SWITCH: name=%s, arg %s\n", kentry_name(entry),
@@ -221,7 +221,7 @@ static kpargv_status_e ksession_parse_arg(ksession_t *session,
 	} else if (KENTRY_MODE_SEQUENCE == mode) {
 		kentry_entrys_node_t *iter = kentry_entrys_iter(entry);
 		kentry_entrys_node_t *saved_iter = iter;
-		const kentry_t *nested = NULL;
+		kentry_t *nested = NULL;
 		kpargv_t *cur_level_pargv = kpargv_new();
 
 		while ((nested = kentry_entrys_each(&iter))) {
@@ -355,7 +355,7 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 	levels_iterr = kpath_iterr(path);
 	level_found = kpath_len(path) - 1; // Levels begin with '0'
 	while ((level = kpath_eachr(&levels_iterr))) {
-		const kentry_t *current_entry = klevel_entry(level);
+		kentry_t *current_entry = klevel_entry(level);
 		// Ignore entries with non-COMMON purpose. These entries are for
 		// special processing and will be ignored here.
 		if (kentry_purpose(current_entry) != KENTRY_PURPOSE_COMMON)
@@ -669,7 +669,7 @@ kexec_t *ksession_parse_for_exec(ksession_t *session, const char *raw_line,
 }
 
 
-kexec_t *ksession_parse_for_local_exec(ksession_t *session, const kentry_t *entry,
+kexec_t *ksession_parse_for_local_exec(ksession_t *session, kentry_t *entry,
 	const kpargv_t *parent_pargv, const kcontext_t *parent_context,
 	const kexec_t *parent_exec)
 {
@@ -823,7 +823,7 @@ static bool_t action_stdout_ev(faux_eloop_t *eloop, faux_eloop_type_e type,
 }
 
 
-bool_t ksession_exec_locally(ksession_t *session, const kentry_t *entry,
+bool_t ksession_exec_locally(ksession_t *session, kentry_t *entry,
 	kpargv_t *parent_pargv, const kcontext_t *parent_context,
 	const kexec_t *parent_exec, int *retcode, char **out)
 {

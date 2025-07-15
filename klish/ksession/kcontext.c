@@ -200,7 +200,7 @@ kparg_t *kcontext_candidate_parg(const kcontext_t *context)
 }
 
 
-const kentry_t *kcontext_candidate_entry(const kcontext_t *context)
+kentry_t *kcontext_candidate_entry(const kcontext_t *context)
 {
 	kparg_t *parg = NULL;
 
@@ -299,7 +299,7 @@ void *kcontext_udata(const kcontext_t *context)
 }
 
 
-const kentry_t *kcontext_command(const kcontext_t *context)
+kentry_t *kcontext_command(const kcontext_t *context)
 {
 	kpargv_t *pargv = NULL;
 

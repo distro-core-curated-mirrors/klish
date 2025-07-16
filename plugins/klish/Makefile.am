@@ -8,6 +8,7 @@ libklish_plugin_klish_la_LIBADD = libklish.la
 libklish_plugin_klish_la_SOURCES += \
 	plugins/klish/private.h \
 	plugins/klish/plugin_init.c \
+	plugins/klish/ptype_command.c \
 	plugins/klish/ptypes.c \
 	plugins/klish/misc.c \
 	plugins/klish/nav.c \

@@ -58,6 +58,7 @@ static bool_t ksession_validate_arg(ksession_t *session, kpargv_t *pargv)
 
 	if (!faux_str_is_empty(out))
 		kparg_set_value(candidate, out);
+	faux_str_free(out);
 
 	return BOOL_TRUE;
 }

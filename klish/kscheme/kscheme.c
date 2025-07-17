@@ -78,11 +78,11 @@ void kscheme_free(kscheme_t *scheme)
 	if (!scheme)
 		return;
 
-	// kustore_free() must be before plugin_free() because plugin_free()
-	// does dlclose() and ustore free function is will not be accessible
 	kustore_free(scheme->ustore);
-	faux_list_free(scheme->plugins);
 	faux_list_free(scheme->entrys);
+	// The plugin_free() must be after all other free functions because
+	// plugins contain free callback function for the other components.
+	faux_list_free(scheme->plugins);
 
 	faux_free(scheme);
 }

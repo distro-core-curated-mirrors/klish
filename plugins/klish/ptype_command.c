@@ -36,30 +36,45 @@
 
 // User data structure to pre-parse config setting.
 typedef struct {
-	const char *cmd; // command (not null-terminated) with "len" length
+	char *cmd; // command (not null-terminated) with "len" length
 	size_t len; // length of command string
 	size_t min_len; // minimal length to satisfy string comparison
 } klish_ptype_COMMAND_t;
+
+
+static void klish_ptype_COMMAND_free(void *data)
+{
+	klish_ptype_COMMAND_t *udata = (klish_ptype_COMMAND_t *)data;
+
+	faux_str_free(udata->cmd);
+	faux_free(udata);
+}
 
 
 klish_ptype_COMMAND_t *klish_ptype_COMMAND_init(kentry_t *entry)
 {
 	klish_ptype_COMMAND_t *udata = NULL;
 	const char *cmd = NULL;
+	char *dupcmd = NULL;
 	size_t len = 0;
 	size_t min_len = 0;
-	char *space = NULL;
+	char *delim = NULL;
 
 	cmd = kentry_value(entry);
 	if (cmd) {
-		space = strchr(cmd, ' ');
-		if (space) {
-			unsigned char val = 0;
-			if (!faux_conv_atouc((char *)(space + 1), &val, 10))
+		delim = strchr(cmd, '|');
+		if (delim) {
+			min_len = delim - cmd;
+			len = strlen(cmd);
+			dupcmd = faux_malloc(len);
+			assert(dupcmd);
+			if (!dupcmd)
 				return NULL;
-			len = space - cmd;
-			min_len = (val < len) ? val : len;
+			memcpy(dupcmd, cmd, min_len);
+			memcpy(dupcmd + min_len, delim + 1, len - min_len);
+			len--; // exclude trailing '\0'
 		} else {
+			dupcmd = faux_str_dup(cmd);
 			len = strlen(cmd);
 			min_len = len;
 		}
@@ -67,20 +82,23 @@ klish_ptype_COMMAND_t *klish_ptype_COMMAND_init(kentry_t *entry)
 		cmd = kentry_name(entry);
 		if (!cmd)
 			return NULL;
+		dupcmd = faux_str_dup(cmd);
 		len = strlen(cmd);
 		min_len = len;
 	}
 
 	udata = faux_malloc(sizeof(*udata));
 	assert(udata);
-	if (!udata)
+	if (!udata) {
+		faux_free(dupcmd);
 		return NULL;
+	}
 
-	udata->cmd = cmd;
+	udata->cmd = dupcmd;
 	udata->len = len;
 	udata->min_len = min_len;
 
-	kentry_set_udata(entry, udata, (kentry_udata_free_fn)faux_free);
+	kentry_set_udata(entry, udata, klish_ptype_COMMAND_free);
 
 	return udata;
 }

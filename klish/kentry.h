@@ -51,7 +51,7 @@ typedef enum {
 } kentry_occurs_e;
 
 
-typedef bool_t (*kentry_udata_free_fn)(void *data);
+typedef void (*kentry_udata_free_fn)(void *data);
 
 
 C_DECL_BEGIN

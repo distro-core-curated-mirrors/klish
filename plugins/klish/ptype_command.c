@@ -1,5 +1,21 @@
 /*
- * Implementation of standard PTYPEs
+ * Implementation of COMMAND and COMMAND_CASE PTYPEs.
+ *
+ * This PTYPE compares user typed value with the entry's "value" field if defined
+ * or entry's name.
+ *
+ * The "value" field supports short variants of commands. That means the user
+ * can specify something like this 'value="environment 3"' where "environment" is
+ * a full command name and the "3" is minimal prefix length enough for PTYPE to
+ * satisfy comparison and return success as return code. I.e. user can type
+ * "env", "envi", "envir", ..., "environment" to execute this command. But the
+ * strings "e" or "en" is not a case because their length is less than "3".
+ *
+ * The COMMAND PTYPE uses internal user data attached to the kentry_t structure
+ * to store pre-parsed command name with length information. It's necessary to
+ * don't parse "value" and "name" fields each time. The PTYPE uses lazy method
+ * i.e. parse data on first request and then store results within internal user
+ * data.
  */
 
 #include <assert.h>
@@ -18,10 +34,11 @@
 #include <klish/kentry.h>
 
 
+// User data structure to pre-parse config setting.
 typedef struct {
-	const char *cmd;
-	size_t len;
-	size_t min_len;
+	const char *cmd; // command (not null-terminated) with "len" length
+	size_t len; // length of command string
+	size_t min_len; // minimal length to satisfy string comparison
 } klish_ptype_COMMAND_t;
 
 
@@ -172,18 +189,29 @@ int klish_help_COMMAND(kcontext_t *context)
  */
 int klish_ptype_COMMAND_CASE(kcontext_t *context)
 {
-	const kentry_t *entry = NULL;
+	kentry_t *entry = NULL;
 	const char *value = NULL;
-	const char *command_name = NULL;
+	klish_ptype_COMMAND_t *udata = NULL;
+	size_t len = 0;
 
 	entry = kcontext_candidate_entry(context);
 	value = kcontext_candidate_value(context);
 
-	command_name = kentry_value(entry);
-	if (!command_name)
-		command_name = kentry_name(entry);
-	if (!command_name)
+	udata = (klish_ptype_COMMAND_t *)kentry_udata(entry);
+	if (!udata) {
+		udata = klish_ptype_COMMAND_init(entry);
+		if (!udata)
+			return -1;
+	}
+
+	len = strlen(value);
+	if (len < udata->min_len || len > udata->len)
 		return -1;
 
-	return strcmp(value, command_name);
+	if (faux_str_cmpn(value, udata->cmd, len) != 0)
+		return -1;
+
+	kcontext_fwrite(context, stdout, udata->cmd, udata->len);
+
+	return 0;
 }

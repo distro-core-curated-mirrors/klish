@@ -119,15 +119,3 @@ int klish_ptype_UINT(kcontext_t *context)
 
 	return 0;
 }
-
-
-/** @brief PTYPE: Arbitrary string
- */
-int klish_ptype_STRING(kcontext_t *context)
-{
-	// Really any string is a ... (surprise!) string
-
-	context = context; // Happy compiler
-
-	return 0;
-}

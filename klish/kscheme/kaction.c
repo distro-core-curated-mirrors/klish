@@ -25,6 +25,8 @@ struct kaction_s {
 	tri_t permanent;
 	tri_t sync;
 	char *script;
+	void *udata;
+	kaction_udata_free_fn udata_free_fn;
 };
 
 
@@ -97,6 +99,8 @@ kaction_t *kaction_new(void)
 	action->script = NULL;
 	action->sym = NULL;
 	action->plugin = NULL;
+	action->udata = NULL;
+	action->udata_free_fn = NULL;
 
 	return action;
 }
@@ -110,6 +114,8 @@ void kaction_free(kaction_t *action)
 	faux_str_free(action->sym_ref);
 	faux_str_free(action->lock);
 	faux_str_free(action->script);
+	if (action->udata && action->udata_free_fn)
+		action->udata_free_fn(action->udata);
 
 	faux_free(action);
 }
@@ -188,4 +194,36 @@ bool_t kaction_is_sync(const kaction_t *action)
 		return BOOL_TRUE;
 
 	return BOOL_FALSE; // Default if not set
+}
+
+
+void *kaction_udata(const kaction_t *action)
+{
+	assert(action);
+	if (!action)
+		return NULL;
+
+	return action->udata;
+}
+
+
+bool_t kaction_set_udata(kaction_t *action, void *data,
+	kaction_udata_free_fn free_fn)
+{
+	assert(action);
+	if (!action)
+		return BOOL_FALSE;
+
+	// Free old udata value
+	if (action->udata) {
+		if (action->udata_free_fn)
+			action->udata_free_fn(action->udata);
+		else if (free_fn)
+			free_fn(action->udata);
+	}
+
+	action->udata = data;
+	action->udata_free_fn = free_fn;
+
+	return BOOL_TRUE;
 }

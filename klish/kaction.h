@@ -30,6 +30,9 @@ typedef enum {
 } kaction_io_e;
 
 
+typedef void (*kaction_udata_free_fn)(void *data);
+
+
 C_DECL_BEGIN
 
 kaction_t *kaction_new(void);
@@ -73,6 +76,10 @@ bool_t kaction_is_permanent(const kaction_t *action);
 tri_t kaction_sync(const kaction_t *action);
 bool_t kaction_set_sync(kaction_t *action, tri_t sync);
 bool_t kaction_is_sync(const kaction_t *action);
+
+void *kaction_udata(const kaction_t *action);
+bool_t kaction_set_udata(kaction_t *action, void *data,
+	kaction_udata_free_fn udata_free_fn);
 
 C_DECL_END
 

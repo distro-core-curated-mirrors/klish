@@ -230,7 +230,7 @@ const char *kcontext_candidate_value(const kcontext_t *context)
 }
 
 
-const kaction_t *kcontext_action(const kcontext_t *context)
+kaction_t *kcontext_action(const kcontext_t *context)
 {
 	faux_list_node_t *node = NULL;
 
@@ -242,7 +242,7 @@ const kaction_t *kcontext_action(const kcontext_t *context)
 	if (!node)
 		return NULL;
 
-	return (const kaction_t *)faux_list_data(node);
+	return (kaction_t *)faux_list_data(node);
 }
 
 

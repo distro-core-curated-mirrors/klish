@@ -38,15 +38,17 @@ static void klish_ptype_STRING_free(void *data)
 }
 
 
-klish_ptype_STRING_t *klish_ptype_STRING_init(kentry_t *entry,
-	const char *pattern)
+klish_ptype_STRING_t *klish_ptype_STRING_init(kaction_t *action)
 {
 	klish_ptype_STRING_t *udata = NULL;
+	const char *pattern = NULL;
 
 	udata = faux_malloc(sizeof(*udata));
 	assert(udata);
 	if (!udata)
 		return NULL;
+
+	pattern = kaction_script(action);
 
 	if (faux_str_is_empty(pattern)) {
 		udata->is_regex = BOOL_FALSE;
@@ -60,27 +62,27 @@ klish_ptype_STRING_t *klish_ptype_STRING_init(kentry_t *entry,
 		}
 	}
 
-	kentry_set_udata(entry, udata, klish_ptype_STRING_free);
+	kaction_set_udata(action, udata, klish_ptype_STRING_free);
 
 	return udata;
 }
 
-/** @brief PTYPE: Arbitrary string
+
+/** @brief PTYPE: String
  */
 int klish_ptype_STRING(kcontext_t *context)
 {
-	kentry_t *entry = NULL;
+	kaction_t *action = NULL;
 	const char *value = NULL;
 	klish_ptype_STRING_t *udata = NULL;
 	size_t len = 0;
 
-	entry = kcontext_candidate_entry(context);
+	action = kcontext_action(context);
 	value = kcontext_candidate_value(context);
 
-	udata = (klish_ptype_STRING_t *)kentry_udata(entry);
+	udata = (klish_ptype_STRING_t *)kaction_udata(action);
 	if (!udata) {
-		const char *pattern = kcontext_script(context);
-		udata = klish_ptype_STRING_init(entry, pattern);
+		udata = klish_ptype_STRING_init(action);
 		if (!udata)
 			return -1;
 	}

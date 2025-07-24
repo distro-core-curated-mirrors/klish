@@ -9,8 +9,8 @@ libklish_plugin_klish_la_SOURCES += \
 	plugins/klish/private.h \
 	plugins/klish/plugin_init.c \
 	plugins/klish/ptype_command.c \
+	plugins/klish/ptype_int.c \
 	plugins/klish/ptype_string.c \
-	plugins/klish/ptypes.c \
 	plugins/klish/misc.c \
 	plugins/klish/nav.c \
 	plugins/klish/log.c

@@ -53,8 +53,10 @@ static bool_t ksession_validate_arg(ksession_t *session, kpargv_t *pargv)
 		return BOOL_FALSE;
 	}
 
-	if (retcode != 0)
+	if (retcode != 0) {
+		faux_str_free(out);
 		return BOOL_FALSE;
+	}
 
 	if (!faux_str_is_empty(out))
 		kparg_set_value(candidate, out);

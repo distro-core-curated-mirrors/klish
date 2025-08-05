@@ -261,6 +261,9 @@
 * [restore="true/false"] - Restore (or not) hierarchy level of executed
 *	entry. Default is "false".
 *
+* [transparent="true/false"] - Entries from higher level is available (or not).
+*	Default is "true".
+*
 * [order="true/false"] - If order="true" then user can't enter previously declared
 *	optional parameters after current validated parameter.
 *	The allowed values is "true" or "false". It's false by default.
@@ -404,6 +407,7 @@
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="help" type="xs:string" use="optional"/>
 		<xs:attribute name="ref" type="xs:string" use="optional"/>
+		<xs:attribute name="transparent" type="xs:boolean" use="optional" default="true"/>
 	</xs:complexType>
 
 

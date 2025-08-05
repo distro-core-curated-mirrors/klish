@@ -24,6 +24,7 @@ struct ientry_s {
 	char *ref;
 	char *value;
 	char *restore;
+	char *transparent;
 	char *order;
 	char *filter;
 	ientry_t * (*entrys)[]; // Nested entrys

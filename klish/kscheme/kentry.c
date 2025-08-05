@@ -26,6 +26,7 @@ struct kentry_s {
 	char *ref_str; // Text reference to aliased ENTRY
 	char *value; // Additional info
 	bool_t restore; // Should entry restore its depth while execution
+	bool_t transparent; // Is higher-level commands available
 	bool_t order; // Is entry ordered
 	kentry_filter_e filter; // Is entry filter. Filter can't have inline actions.
 	faux_list_t *entrys; // Nested ENTRYs
@@ -82,6 +83,10 @@ KSET_STR(entry, value);
 // Restore
 KGET_BOOL(entry, restore);
 KSET_BOOL(entry, restore);
+
+// Transparent
+KGET_BOOL(entry, transparent);
+KSET_BOOL(entry, transparent);
 
 // Order
 KGET_BOOL(entry, order);
@@ -142,6 +147,7 @@ kentry_t *kentry_new(const char *name)
 	entry->ref_str = NULL;
 	entry->value = NULL;
 	entry->restore = BOOL_FALSE;
+	entry->transparent = BOOL_TRUE;
 	entry->order = BOOL_FALSE;
 	entry->filter = KENTRY_FILTER_FALSE;
 	entry->udata = NULL;
@@ -229,7 +235,7 @@ bool_t kentry_link(kentry_t *dst, const kentry_t *src)
 	// worse.
 	// TODO: Some fields must be copied from src if they are not defined in
 	// dst explicitly. But now I don't know how to do so. These fields are:
-	// container, purpose, min, max, restore, order.
+	// container, purpose, min, max, restore, transparent, order.
 
 	// name - orig
 	// help - orig
@@ -247,6 +253,7 @@ bool_t kentry_link(kentry_t *dst, const kentry_t *src)
 	if (!dst->value)
 		dst->value = faux_str_dup(src->value);
 	// restore - orig
+	// transparent - orig
 	// order - orig
 	// filter - ref
 	dst->filter = src->filter;

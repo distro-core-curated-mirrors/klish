@@ -1513,6 +1513,19 @@ move to a new section, but already on the basis of the current path correspondin
 the command to enter a new section.
 
 
+#### Attribute `transparent`
+
+The `transparent` attribute determines whether the upper path level elements
+available while command line parsing. It concerns command searching, help
+generation and autocompletion.
+
+The attribute us used in the `ENTRY` and `VIEW` elements.
+
+By default all elements are transparent i.e. all path levels are available. The
+parser will stop searching if current path element contains
+`transparent="false"`.
+
+
 #### Attribute `order`
 
 The `order` attribute determines whether the order is important when entering declared one after another

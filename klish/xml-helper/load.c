@@ -537,6 +537,7 @@ static bool_t process_entry(const kxml_node_t *element, void *parent,
 	ientry.ref = kxml_node_attr(element, "ref");
 	ientry.value = kxml_node_attr(element, "value");
 	ientry.restore = kxml_node_attr(element, "restore");
+	ientry.transparent = kxml_node_attr(element, "transparent");
 	ientry.order = kxml_node_attr(element, "order");
 	ientry.filter = kxml_node_attr(element, "filter");
 
@@ -558,6 +559,7 @@ err:
 	kxml_node_attr_free(ientry.ref);
 	kxml_node_attr_free(ientry.value);
 	kxml_node_attr_free(ientry.restore);
+	kxml_node_attr_free(ientry.transparent);
 	kxml_node_attr_free(ientry.order);
 	kxml_node_attr_free(ientry.filter);
 
@@ -587,6 +589,7 @@ static bool_t process_view(const kxml_node_t *element, void *parent,
 	ientry.ref = kxml_node_attr(element, "ref");
 	ientry.value = NULL;
 	ientry.restore = "false";
+	ientry.transparent = kxml_node_attr(element, "transparent");
 	ientry.order = "false";
 	ientry.filter = "false";
 
@@ -601,6 +604,7 @@ err:
 	kxml_node_attr_free(ientry.name);
 	kxml_node_attr_free(ientry.help);
 	kxml_node_attr_free(ientry.ref);
+	kxml_node_attr_free(ientry.transparent);
 
 	return res;
 }
@@ -635,6 +639,7 @@ static bool_t process_ptype(const kxml_node_t *element, void *parent,
 	ientry.max = "1";
 	ientry.value = kxml_node_attr(element, "value");
 	ientry.restore = "false";
+	ientry.transparent = "true";
 	ientry.order = "true";
 	ientry.filter = "false";
 
@@ -759,6 +764,7 @@ static bool_t process_param(const kxml_node_t *element, void *parent,
 	ientry.ref = kxml_node_attr(element, "ref");
 	ientry.value = kxml_node_attr(element, "value");
 	ientry.restore = "false";
+	ientry.transparent = "true";
 	ientry.order = kxml_node_attr(element, "order");
 	ientry.filter = "false";
 
@@ -873,6 +879,7 @@ static bool_t process_command(const kxml_node_t *element, void *parent,
 		ientry.value = NULL;
 		ientry.restore = "false";
 	}
+	ientry.transparent = "true";
 	ientry.order = "false";
 	// Filter
 	ientry.filter = kxml_node_attr(element, "filter");

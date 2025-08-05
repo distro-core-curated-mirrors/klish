@@ -124,6 +124,18 @@ bool_t ientry_parse(const ientry_t *info, kentry_t *entry, faux_error_t *error)
 		}
 	}
 
+	// Transparent
+	if (!faux_str_is_empty(info->transparent)) {
+		bool_t b = BOOL_FALSE;
+		if (!faux_conv_str2bool(info->transparent, &b) ||
+			!kentry_set_transparent(entry, b))
+		{
+			faux_error_add(error,
+				TAG": Illegal 'transparent' attribute");
+			retcode = BOOL_FALSE;
+		}
+	}
+
 	// Order
 	if (!faux_str_is_empty(info->order)) {
 		bool_t b = BOOL_FALSE;
@@ -384,6 +396,9 @@ char *ientry_deploy(const kentry_t *kentry, int level)
 
 		attr2ctext(&str, "value", kentry_value(kentry), level + 1);
 		attr2ctext(&str, "restore", faux_conv_bool2str(kentry_restore(kentry)), level + 1);
+		attr2ctext(&str, "transparent",
+			faux_conv_bool2str(kentry_transparent(kentry)),
+			level + 1);
 		attr2ctext(&str, "order", faux_conv_bool2str(kentry_order(kentry)), level + 1);
 
 		// Filter

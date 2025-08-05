@@ -376,6 +376,9 @@ kpargv_t *ksession_parse_line(ksession_t *session, const faux_argv_t *argv,
 			break;
 		if (dont_parse_upper)
 			break;
+		// If level is not transparent, then we stop here
+		if (kentry_transparent(current_entry) == BOOL_FALSE)
+			break;
 		level_found--;
 	}
 	// Save last argument

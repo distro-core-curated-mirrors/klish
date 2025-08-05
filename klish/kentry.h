@@ -93,6 +93,9 @@ bool_t kentry_set_value(kentry_t *entry, const char *value);
 // Restore
 bool_t kentry_restore(const kentry_t *entry);
 bool_t kentry_set_restore(kentry_t *entry, bool_t restore);
+// Transparent
+bool_t kentry_transparent(const kentry_t *entry);
+bool_t kentry_set_transparent(kentry_t *entry, bool_t transparent);
 // Order
 bool_t kentry_order(const kentry_t *entry);
 bool_t kentry_set_order(kentry_t *entry, bool_t order);

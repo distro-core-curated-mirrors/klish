@@ -71,6 +71,7 @@ static kpargv_status_e ksession_parse_arg(ksession_t *session,
 	kpargv_t *pargv, bool_t entry_is_command, bool_t is_filter)
 {
 	kentry_t *entry = current_entry;
+	kentry_t *cond = NULL;
 	kentry_mode_e mode = KENTRY_MODE_NONE;
 	kpargv_status_e retcode = KPARSE_NONE; // For ENTRY itself
 	kpargv_status_e rc = KPARSE_NONE; // For nested ENTRYs
@@ -90,6 +91,18 @@ static kpargv_status_e ksession_parse_arg(ksession_t *session,
 	assert(pargv);
 	if (!pargv)
 		return KPARSE_ERROR;
+
+	// Get COND from the current entry and test it
+	cond = kentry_nested_by_purpose(entry, KENTRY_PURPOSE_COND);
+	if (cond) {
+		bool_t res = BOOL_FALSE;
+		int rc = -1;
+
+		res = ksession_exec_locally(session, cond, pargv, NULL, NULL,
+			&rc, NULL);
+		if (!res || rc != 0)
+			return KPARSE_NONE;
+	}
 
 	purpose = kpargv_purpose(pargv); // Purpose of parsing
 

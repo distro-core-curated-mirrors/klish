@@ -56,7 +56,7 @@ static const luaL_Reg klish_lib[] = {
 };
 
 #if LUA_VERSION_NUM >= 502
-static int traceback (lua_State *L)
+static int traceback(lua_State *L)
 {
 	const char *msg = lua_tostring(L, 1);
 
@@ -70,7 +70,7 @@ static int traceback (lua_State *L)
 	return 1;
 }
 #else
-static int traceback (lua_State *L)
+static int traceback(lua_State *L)
 {
 	lua_getfield(L, LUA_GLOBALSINDEX, "debug");
 	if (!lua_istable(L, -1)) {
@@ -91,16 +91,22 @@ static int traceback (lua_State *L)
 #endif
 
 
-static int report (lua_State *L, int status)
+static int report(lua_State *L, int status)
 {
-	if (status && !lua_isnil(L, -1)) {
+	if (lua_isnil(L, -1))
+		return status;
+
+	if (status) {
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL)
 			msg = "(error object is not a string)";
 		fprintf(stderr,"Error: %s\n", msg);
 		lua_pop(L, 1);
-		status = -1;
+		return -1;
 	}
+
+	status = lua_tointeger(L, -1);
+	lua_pop(L, 1);
 
 	return status;
 }

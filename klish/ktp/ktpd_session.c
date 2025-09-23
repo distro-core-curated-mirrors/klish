@@ -171,7 +171,7 @@ static char *generate_prompt(ktpd_session_t *ktpd)
 
 			res = ksession_exec_locally(ktpd->session,
 				prompt_entry, NULL, NULL, NULL, &rc, &prompt);
-			if (!res || (rc < 0) || !prompt) {
+			if (!res || (rc != 0) || !prompt) {
 				if (prompt)
 					faux_str_free(prompt);
 				prompt = NULL;
@@ -592,7 +592,6 @@ static bool_t ktpd_session_log(ktpd_session_t *ktpd, const kexec_t *exec)
 	while ((context = kexec_contexts_each(&iter))) {
 		kentry_t *entry = kcontext_command(context);
 		kentry_t *log_entry = NULL;
-		int rc = -1;
 
 		if (!entry)
 			continue;
@@ -602,7 +601,7 @@ static bool_t ktpd_session_log(ktpd_session_t *ktpd, const kexec_t *exec)
 		if (kentry_actions_len(log_entry) == 0)
 			continue;
 		ksession_exec_locally(ktpd->session, log_entry,
-			kcontext_pargv(context), context, exec, &rc, NULL);
+			kcontext_pargv(context), context, exec, NULL, NULL);
 	}
 
 	return BOOL_TRUE;
@@ -712,7 +711,7 @@ static bool_t ktpd_session_process_completion(ktpd_session_t *ktpd, faux_msg_t *
 			res = ksession_exec_locally(ktpd->session, completion,
 				pargv, NULL, NULL, &rc, &out);
 			kparg_free(parg);
-			if (!res || (rc < 0) || !out) {
+			if (!res || (rc != 0) || !out) {
 				if (out)
 					faux_str_free(out);
 				continue;
@@ -842,33 +841,38 @@ static bool_t ktpd_session_process_help(ktpd_session_t *ktpd, faux_msg_t *msg)
 			if (help) {
 				char *out = NULL;
 				kparg_t *parg = NULL;
+				bool_t res = BOOL_FALSE;
 				int rc = -1;
+				const char *str = NULL;
+				char *prefix_str = NULL;
+				char *line_str = NULL;
 
 				parg = kparg_new(candidate, prefix);
 				kpargv_set_candidate_parg(pargv, parg);
-				ksession_exec_locally(ktpd->session,
+				res = ksession_exec_locally(ktpd->session,
 					help, pargv, NULL, NULL, &rc, &out);
 				kparg_free(parg);
-
-				if (out) {
-					const char *str = out;
-					char *prefix_str = NULL;
-					char *line_str = NULL;
-					do {
-						prefix_str = faux_str_getline(str, &str);
-						if (!prefix_str)
-							break;
-						line_str = faux_str_getline(str, &str);
-						if (!line_str) {
-							faux_str_free(prefix_str);
-							break;
-						}
-						help_struct = help_new(prefix_str, line_str);
-						if (!faux_list_add(help_list, help_struct))
-							help_free(help_struct);
-					} while (line_str);
-					faux_str_free(out);
+				if (!res || (rc != 0) || !out) {
+					if (out)
+						faux_str_free(out);
+					continue;
 				}
+
+				str = out;
+				do {
+					prefix_str = faux_str_getline(str, &str);
+					if (!prefix_str)
+						break;
+					line_str = faux_str_getline(str, &str);
+					if (!line_str) {
+						faux_str_free(prefix_str);
+						break;
+					}
+					help_struct = help_new(prefix_str, line_str);
+					if (!faux_list_add(help_list, help_struct))
+						help_free(help_struct);
+				} while (line_str);
+				faux_str_free(out);
 
 			// Generate help with available information
 			} else {

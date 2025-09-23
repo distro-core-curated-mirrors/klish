@@ -1412,7 +1412,7 @@ attribute value.
 * `prompt` - the element is used to generate a user prompt for the
 of the parent element. Tag `PROMPT`. The parent element is `VIEW`.
 * `cond` - the element checks the condition and, if it fails, the parent element
-becomes unavailable to the operator. Tag `COND`. Not currently implemented.
+becomes unavailable to the operator. Tag `COND`. Implemented in version 3.2.0.
 * `completion` - the element generates possible auto-completions for the parent one
 element. Tag `COMPL`.
 * `help` - the element generates a hint for the parent element. Tag `HELP`.
@@ -2091,7 +2091,7 @@ autocomplete options.
 
 ### COND
 
-> The functionality of the `COND` element has not yet been implemented.
+> The `COND` element is implemented in version 3.2.0.
 
 The `COND` element has a special purpose and is nested for elements
 `VIEW`, `COMMAND`, `PARAM`. The purpose of the element is to hide the element from the operator in the

@@ -36,6 +36,7 @@ Inside the COMMAND tag, a new "nav" attribute appears - navigation. New navigati
 * `replace:<view>[@<level>]` - remain at the current nesting level, replacing the current VIEW with the one specified in the command. If the tree level <level> is specified, <view> replaces not the current VIEW, but the VIEW at the specified level. The level might be invalid. For example, being above the current level or < 1. In such a case, a navigation error is issued.
 * `exit` - exit the program.
 
+
 ### Schema Definition Method
 
 Currently, the schema and command set are defined using XML files. A mechanism needs to be developed that allows describing the schema and commands in other ways. Each method can have its strengths and applications. Possible methods:

@@ -33,7 +33,8 @@ EXTRA_DIST = \
 	plugins/Makefile.am \
 	klish.xsd \
 	LICENCE \
-	README.md
+	README.md \
+	CHANGES.md
 
 include $(top_srcdir)/bin/Makefile.am
 include $(top_srcdir)/dbs/Makefile.am

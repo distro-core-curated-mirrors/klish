@@ -49,7 +49,7 @@
 // Local static functions
 bool_t daemonize(const char *pidfile);
 bool_t kentry_entrys_is_empty(const kentry_t *entry);
-static int create_listen_unix_sock(const char *path);
+static int create_listen_unix_sock(struct unix_socket_config *socket_cfg);
 static kscheme_t *load_all_dbs(const char *dbs,
 	faux_ini_t *global_config, faux_error_t *error);
 static bool_t clear_scheme(kscheme_t *scheme, faux_error_t *error);
@@ -127,8 +127,8 @@ int main(int argc, char **argv)
 	}
 
 	// Listen socket
-	syslog(LOG_DEBUG, "Create listen UNIX socket: %s", opts->unix_socket_path);
-	listen_unix_sock = create_listen_unix_sock(opts->unix_socket_path);
+	syslog(LOG_DEBUG, "Create listen UNIX socket: %s", opts->socket_cfg.path);
+	listen_unix_sock = create_listen_unix_sock(&opts->socket_cfg);
 	if (listen_unix_sock < 0)
 		goto err;
 	syslog(LOG_DEBUG, "Listen socket %d", listen_unix_sock);
@@ -444,22 +444,23 @@ static bool_t clear_scheme(kscheme_t *scheme, faux_error_t *error)
  * Previously removes old socket's file from filesystem. Note daemon must check
  * for already working daemon to don't duplicate.
  *
- * @param [in] path Socket path within filesystem.
+ * @param [in] socket_cfg Socket config.
  * @return Socket descriptor of < 0 on error.
  */
-static int create_listen_unix_sock(const char *path)
+
+static int create_listen_unix_sock(struct unix_socket_config *socket_cfg)
 {
 	int sock = -1;
 	int opt = 1;
 	struct sockaddr_un laddr = {};
 
-	assert(path);
-	if (!path)
+	assert(socket_cfg->path);
+	if (!socket_cfg->path)
 		return -1;
 
 	if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		syslog(LOG_ERR, "Can't create socket: %s", strerror(errno));
-		goto err;
+		return -1;
 	}
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
 		syslog(LOG_ERR, "Can't set socket options: %s", strerror(errno));
@@ -467,27 +468,66 @@ static int create_listen_unix_sock(const char *path)
 	}
 
 	// Remove old (lost) socket's file
-	unlink(path);
+	unlink(socket_cfg->path);
 
 	laddr.sun_family = AF_UNIX;
-	strncpy(laddr.sun_path, path, USOCK_PATH_MAX);
+	strncpy(laddr.sun_path, socket_cfg->path, USOCK_PATH_MAX);
 	laddr.sun_path[USOCK_PATH_MAX - 1] = '\0';
 	if (bind(sock, (struct sockaddr *)&laddr, sizeof(laddr))) {
-		syslog(LOG_ERR, "Can't bind socket %s: %s", path, strerror(errno));
+		syslog(LOG_ERR, "Can't bind socket %s: %s", socket_cfg->path, strerror(errno));
 		goto err;
 	}
 
+	if (socket_cfg->user || socket_cfg->group) {
+		uid_t uid = -1;
+		gid_t gid = -1;
+
+		if (socket_cfg->user) {
+			if (!faux_sysdb_uid_by_name(socket_cfg->user, &uid)) {
+				syslog(LOG_ERR, "Can't get UID for socket %s: %s",
+					socket_cfg->path, strerror(errno));
+				goto err;
+			}
+		}
+
+		if (socket_cfg->group) {
+			if (!faux_sysdb_gid_by_name(socket_cfg->group, &gid)) {
+				syslog(LOG_ERR, "Can't get GID for socket %s: %s",
+					socket_cfg->path, strerror(errno));
+				goto err;
+			}
+		}
+
+		if (chown(socket_cfg->path, uid, gid)) {
+			syslog(LOG_ERR, "Can't chown socket %s: %s",
+				socket_cfg->path, strerror(errno));
+			goto err;
+		}
+	}
+
+	if (socket_cfg->mode) {
+		unsigned int mode = 0;
+
+		if (!faux_conv_atoui(socket_cfg->mode, &mode, 8)) {
+			syslog(LOG_ERR, "Can't parse socket %s mode", socket_cfg->path);
+			goto err;
+		}
+		if (chmod(socket_cfg->path, mode)) {
+			syslog(LOG_ERR, "Can't chmod socket %s: %s", socket_cfg->path, strerror(errno));
+			goto err;
+		}
+	}
+
 	if (listen(sock, 128)) {
-		unlink(path);
-		syslog(LOG_ERR, "Can't listen on socket %s: %s", path, strerror(errno));
+		syslog(LOG_ERR, "Can't listen on socket %s: %s", socket_cfg->path, strerror(errno));
 		goto err;
 	}
 
 	return sock;
 
 err:
-	if (sock >= 0)
-		close(sock);
+	close(sock);
+	unlink(socket_cfg->path);
 
 	return -1;
 }

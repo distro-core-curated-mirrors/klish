@@ -36,7 +36,7 @@ struct options *opts_init(void)
 	// Initialize
 	opts->pidfile = faux_str_dup(DEFAULT_PIDFILE);
 	opts->cfgfile = faux_str_dup(DEFAULT_CFGFILE);
-	opts->unix_socket_path = faux_str_dup(KLISH_DEFAULT_UNIX_SOCKET_PATH);
+	opts->socket_cfg.path = faux_str_dup(KLISH_DEFAULT_UNIX_SOCKET_PATH);
 	opts->cfgfile_userdefined = BOOL_FALSE;
 	opts->foreground = BOOL_FALSE; // Daemonize by default
 	opts->verbose = BOOL_FALSE;
@@ -53,7 +53,10 @@ void opts_free(struct options *opts)
 {
 	faux_str_free(opts->pidfile);
 	faux_str_free(opts->cfgfile);
-	faux_str_free(opts->unix_socket_path);
+	faux_str_free(opts->socket_cfg.path);
+	faux_str_free(opts->socket_cfg.user);
+	faux_str_free(opts->socket_cfg.group);
+	faux_str_free(opts->socket_cfg.mode);
 	faux_str_free(opts->dbs);
 	faux_free(opts);
 }
@@ -177,8 +180,26 @@ faux_ini_t *config_parse(const char *cfgfile, struct options *opts)
 
 	// UnixSocketPath
 	if ((tmp = faux_ini_find(ini, "UnixSocketPath"))) {
-		faux_str_free(opts->unix_socket_path);
-		opts->unix_socket_path = faux_str_dup(tmp);
+		faux_str_free(opts->socket_cfg.path);
+		opts->socket_cfg.path = faux_str_dup(tmp);
+	}
+
+	// UnixSocketUser
+	if ((tmp = faux_ini_find(ini, "UnixSocketUser"))) {
+		faux_str_free(opts->socket_cfg.user);
+		opts->socket_cfg.user = faux_str_dup(tmp);
+	}
+
+	// UnixSocketGroup
+	if ((tmp = faux_ini_find(ini, "UnixSocketGroup"))) {
+		faux_str_free(opts->socket_cfg.group);
+		opts->socket_cfg.group = faux_str_dup(tmp);
+	}
+
+	// UnixSocketMode
+	if ((tmp = faux_ini_find(ini, "UnixSocketMode"))) {
+		faux_str_free(opts->socket_cfg.mode);
+		opts->socket_cfg.mode = faux_str_dup(tmp);
 	}
 
 	// DBs
@@ -204,7 +225,10 @@ int opts_show(struct options *opts)
 	syslog(LOG_DEBUG, "opts: LogFacility = %s\n", faux_log_facility_str(opts->log_facility));
 	syslog(LOG_DEBUG, "opts: PIDPath = %s\n", opts->pidfile);
 	syslog(LOG_DEBUG, "opts: ConfigPath = %s\n", opts->cfgfile);
-	syslog(LOG_DEBUG, "opts: UnixSocketPath = %s\n", opts->unix_socket_path);
+	syslog(LOG_DEBUG, "opts: UnixSocketPath = %s\n", opts->socket_cfg.path);
+	syslog(LOG_DEBUG, "opts: UnixSocketUser = %s\n", opts->socket_cfg.user ? opts->socket_cfg.user : "None");
+	syslog(LOG_DEBUG, "opts: UnixSocketGroup = %s\n", opts->socket_cfg.group ? opts->socket_cfg.group : "None");
+	syslog(LOG_DEBUG, "opts: UnixSocketMode = %s\n", opts->socket_cfg.mode ? opts->socket_cfg.mode : "None");
 	syslog(LOG_DEBUG, "opts: DBs = %s\n", opts->dbs);
 
 	return 0;

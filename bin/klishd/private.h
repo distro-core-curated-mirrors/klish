@@ -11,13 +11,24 @@
 #define DEFAULT_DBS "libxml2"
 
 
+/** @brief Unix socket parameters specified in the config file.
+ *
+ * It is used to configure the permissions and ownership of the socket file.
+ */
+struct unix_socket_config {
+	char *path;
+	char *user;
+	char *group;
+	char *mode;
+ };
+
 /** @brief Command line and config file options
  */
 struct options {
 	char *pidfile;
 	char *cfgfile;
 	bool_t cfgfile_userdefined;
-	char *unix_socket_path;
+	struct unix_socket_config socket_cfg;
 	char *dbs;
 	bool_t foreground; // Don't daemonize
 	bool_t verbose;
